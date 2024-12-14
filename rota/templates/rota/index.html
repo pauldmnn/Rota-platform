@@ -5,3 +5,9 @@
         <li>{{ entry.day }}: {{ entry.shift_type }} {% if entry.shift_type == "Custom" %}({{ entry.start_time }} - {{ entry.end_time }}){% endif %}</li>
     {% endfor %}
 </ul>
+<h3>Day Requests:</h3>
+<ul>
+    {% for request in requests %}
+        <li>{{ request.requested_day }} - {{ request.status }} {% if request.comment %} (Reason: {{ request.comment }}){% endif %}</li>
+    {% endfor %}
+</ul>
