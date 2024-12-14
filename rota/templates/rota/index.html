@@ -1,6 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock title %}
+
+{% block content %}
 <h1>Welcome, {{ user.username }}</h1>
-<ul>
-    {% for rota in rotas %}
-        <li>{{ rota.day }}: {{ rota.shift_type }}</li>
-    {% endfor %}
-</ul>
+<h2>Your Weekly Rota</h2>
+<table class="table table-striped mt-4">
+    <thead>
+        <tr>
+            <th>Day</th>
+            <th>Shift Type</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for rota in rotas %}
+        <tr>
+            <td>{{ rota.day }}</td>
+            <td>{{ rota.shift_type }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock content %}
