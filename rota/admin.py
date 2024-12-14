@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Rota
+from .models import Rota, Request
 # Register your models here.
 
 @admin.register(Rota)
