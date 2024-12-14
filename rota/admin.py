@@ -5,3 +5,8 @@ from .models import Rota
 @admin.register(Rota)
 class RotaAdmin(admin.ModelAdmin):
     list_display = ('user', 'day', 'shift_type', 'start_time', 'end_time')
+
+
+@admin.register(Request)
+class RequestAdmin(admin.ModelAdmin):
+    list_display = ('user', 'requested_day', 'status', 'comment')
