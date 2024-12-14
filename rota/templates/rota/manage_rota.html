@@ -1,0 +1,28 @@
+<h1>Manage Rota</h1>
+<form method="post">
+    {% csrf_token %}
+    <select name="user_id">
+        {% for user in users %}
+            <option value="{{ user.id }}">{{ user.username }}</option>
+        {% endfor %}
+    </select>
+    <select name="day">
+        <option>Monday</option>
+        <option>Tuesday</option>
+        <option>Wednesday</option>
+        <option>Thursday</option>
+        <option>Friday</option>
+        <option>Saturday</option>
+        <option>Sunday</option>
+    </select>
+    <select name="shift_type">
+        <option>Long Day</option>
+        <option>Early</option>
+        <option>Late</option>
+        <option>Night</option>
+        <option>Custom</option>
+    </select>
+    <input type="time" name="start_time" placeholder="Start Time">
+    <input type="time" name="end_time" placeholder="End Time">
+    <button type="submit">Update Rota</button>
+</form>

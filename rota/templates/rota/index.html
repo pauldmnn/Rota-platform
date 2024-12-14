@@ -1,0 +1,7 @@
+<h1>Welcome {{ user.username }}</h1>
+<h2>Your Rota:</h2>
+<ul>
+    {% for entry in rota %}
+        <li>{{ entry.day }}: {{ entry.shift_type }} {% if entry.shift_type == "Custom" %}({{ entry.start_time }} - {{ entry.end_time }}){% endif %}</li>
+    {% endfor %}
+</ul>
