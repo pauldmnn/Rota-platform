@@ -8,6 +8,7 @@
 <table class="table table-striped mt-4">
     <thead>
         <tr>
+            <th>Date</th>
             <th>Day</th>
             <th>Shift Type</th>
         </tr>
@@ -15,10 +16,12 @@
     <tbody>
         {% for rota in rotas %}
         <tr>
-            <td>{{ rota.day }}</td>
+            <td>{{ rota.date }}</td>
+            <td>{{ rota.day }}</td> <!-- Automatically computed day -->
             <td>{{ rota.shift_type }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+
 {% endblock content %}

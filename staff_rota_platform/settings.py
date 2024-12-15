@@ -113,7 +113,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LOGIN_REDIRECT_URL = '/dashboard/'
 CSRF_TRUSTED_ORIGINS = [
     'https://8000-pauldmnn-rotaplatform-bswsshkpux0.ws.codeinstitute-ide.net',
-    "https://*.herokuapp.com"]
+    'https://rota-platform-0319936c5b72.herokuapp.com']
 
 
 # Internationalization
