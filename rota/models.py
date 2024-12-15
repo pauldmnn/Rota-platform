@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import date
 
 # Shift type choices
 SHIFT_CHOICES = [
@@ -15,7 +16,7 @@ class Rota(models.Model):
     Rota model represents the work schedule for staff.
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # Link to User model
-    date = models.DateField()  # The specific date for the rota
+    date = models.DateField(default=date(2024, 1, 1))  # The specific date for the rota
     shift_type = models.CharField(max_length=10, choices=SHIFT_CHOICES, default="Long Day")  # Shift type
     start_time = models.TimeField(blank=True, null=True)  # Optional custom start time
     end_time = models.TimeField(blank=True, null=True)  # Optional custom end time
@@ -28,7 +29,9 @@ class Rota(models.Model):
         return self.date.strftime("%A")  # e.g., Monday, Tuesday
 
     def __str__(self):
-        return f"{self.user.username}: {self.day} - {self.date} - {self.shift_type}"
+        if self.shift_type == "Custom" and self.start_time and self.end_time:
+            return f"{self.user.username}: {self.date} - {self.shift_type} ({self.start_time} to {self.end_time})"
+        return f"{self.user.username}: {self.date} - {self.shift_type}"
 
 
 class Request(models.Model):

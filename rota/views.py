@@ -4,6 +4,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from .models import Rota, Request
+import datetime
 
 @login_required
 def index(request):
@@ -42,22 +43,31 @@ def logout_view(request):
     logout(request)
     return redirect('login')
 
-# User dashboard
 @login_required
 def dashboard(request):
     """
-    Displays the rota for the logged-in user.
+    Displays future shifts for the logged-in user.
     """
-    rotas = Rota.objects.filter(user=request.user).order_by('date')
-    return render(request, 'rota/dashboard.html', {"rotas": rotas})
+    today = datetime.date.today()
+    future_shifts = Rota.objects.filter(user=request.user, date__gte=today).order_by('date')
+
+    return render(request, "rota/dashboard.html", {"future_shifts": future_shifts})
+
+
+@login_required
+def completed_shifts(request):
+    """
+    Displays completed shifts for the logged-in user.
+    """
+    today = datetime.date.today()
+    completed_shifts = Rota.objects.filter(user=request.user, date__lt=today).order_by('-date')
+
+    return render(request, "rota/completed_shifts.html", {"completed_shifts": completed_shifts})
+
 
 # Admin manage rota view
 @login_required
 def manage_rota(request):
-    """
-    Allows admin or staff users to manage the rota.
-    Non-staff users see a 'not authorized' page.
-    """
     if not request.user.is_staff:
         return render(request, "rota/not_authorized.html")
 
@@ -83,7 +93,7 @@ def manage_rota(request):
                 "error": "Selected user does not exist."
             })
 
-        # Check for overlapping shifts
+        # Check for duplicate rota
         existing_rota = Rota.objects.filter(user=user, date=date).exists()
         if existing_rota:
             return render(request, "rota/manage_rota.html", {
@@ -108,22 +118,33 @@ def manage_rota(request):
 @login_required
 def request_day(request):
     """
-    Allows staff to request specific days to work.
+    Allows staff to request specific days.
+    Only logged-in non-admin users can access this view.
     """
+    if request.user.is_staff:  # Admins shouldn't access this view
+        return redirect('manage_requests')
+
     if request.method == 'POST':
         requested_day = request.POST.get("requested_day")
+        # Check for duplicate requests
+        existing_request = Request.objects.filter(user=request.user, requested_day=requested_day).exists()
+        if existing_request:
+            return render(request, "rota/request_day.html", {"error": "You have already requested this day."})
+
+        # Create the request
         Request.objects.create(user=request.user, requested_day=requested_day)
         return redirect('dashboard')
-    return render(request, 'rota/request_day.html')
+
+    return render(request, "rota/request_day.html")
 
 # Admin manage requests view
 @login_required
 def manage_requests(request):
     """
-    Allows admin to view, approve, or reject staff requests.
+    Allows admins to view and respond to staff requests.
     """
-    if not request.user.is_staff:
-        return render(request, "rota/not_authorized.html")
+    if not request.user.is_staff:  # Ensure only admins access this view
+        return redirect('dashboard')
 
     if request.method == 'POST':
         request_id = request.POST.get("request_id")

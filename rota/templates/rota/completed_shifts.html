@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Completed Shifts{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Completed Shifts</h1>
+
+    {% if completed_shifts %}
+    <table class="table table-striped mt-4">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Day</th>
+                <th>Shift Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for shift in completed_shifts %}
+            <tr>
+                <td>{{ shift.date }}</td>
+                <td>{{ shift.day }}</td>
+                <td>{{ shift.shift_type }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-info mt-4">You have no completed shifts.</div>
+    {% endif %}
+</div>
+{% endblock content %}

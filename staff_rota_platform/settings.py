@@ -109,8 +109,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGIN_URL = '/login/'  # Redirects to this page when authentication is required
+LOGIN_REDIRECT_URL = '/'  # Redirects to this URL after successful login
 
-LOGIN_REDIRECT_URL = '/dashboard/'
 CSRF_TRUSTED_ORIGINS = [
     'https://8000-pauldmnn-rotaplatform-bswsshkpux0.ws.codeinstitute-ide.net',
     'https://rota-platform-0319936c5b72.herokuapp.com']
@@ -134,6 +135,10 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+#STATIC_URL = '/static/'
+#STATICFILES_DIRS = [BASE_DIR / "static"]
+#STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
