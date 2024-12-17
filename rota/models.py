@@ -16,13 +16,13 @@ class Rota(models.Model):
     """
     Model to store shift details for staff members.
     """
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Staff member
-    date = models.DateField()  # Date of the shift
+    user = models.ForeignKey(User, on_delete=models.CASCADE) 
+    date = models.DateField()  
     shift_type = models.CharField(
         max_length=20, choices=SHIFT_CHOICES, default="Long Day"
-    )  # Type of shift
-    start_time = models.TimeField(blank=True, null=True)  # Optional start time for custom shifts
-    end_time = models.TimeField(blank=True, null=True)  # Optional end time for custom shifts
+    )  
+    start_time = models.TimeField(blank=True, null=True)  
+    end_time = models.TimeField(blank=True, null=True) 
 
     class Meta:
         unique_together = ('user', 'date')
@@ -33,20 +33,20 @@ class Rota(models.Model):
             return f"{self.user.username} - {self.date} - Custom ({self.start_time} to {self.end_time})"
         return f"{self.user.username} - {self.date} - {self.shift_type}"
 
-
+# Staff making request to be off or work certain days
 class Request(models.Model):
     """
     Model for staff day-off requests.
     """
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Staff member making the request
-    requested_day = models.DateField()  # Day they are requesting off
-    comment = models.TextField(blank=True, null=True)  # Staff comment for the request
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  
+    requested_day = models.DateField() 
+    comment = models.TextField(blank=True, null=True)  
     status = models.CharField(
         max_length=10,
         choices=[("Pending", "Pending"), ("Approved", "Approved"), ("Rejected", "Rejected")],
         default="Pending",
-    )  # Status of the request
-    admin_comment = models.TextField(blank=True, null=True)  # Admin's reason for rejection
+    )  
+    admin_comment = models.TextField(blank=True, null=True) 
 
     def __str__(self):
         return f"{self.user.username} - {self.requested_day} ({self.status})"

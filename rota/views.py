@@ -4,14 +4,45 @@ from django.urls import reverse_lazy
 from django.shortcuts import render, redirect
 from .models import Request, Rota
 import datetime
+from datetime import timedelta
 
-# Custom Login View
+
+@login_required
+def admin_weekly_rota(request):
+    """
+    View to display the weekly rota in a table format.
+    """
+    # Calculate the current week's start date (week commencing)
+    today = datetime.date.today()
+    week_start = today - timedelta(days=today.weekday())  # Monday as start of the week
+    week_days = [(week_start + timedelta(days=i)) for i in range(7)]  # 7 days of the week
+
+    # Query all rota entries for this week
+    rota_entries = Rota.objects.filter(date__range=(week_start, week_start + timedelta(days=6)))
+
+    # Organize data
+    rota_data = {}
+    for entry in rota_entries:
+        if entry.user.username not in rota_data:
+            rota_data[entry.user.username] = {}
+        rota_data[entry.user.username][entry.date] = f"{entry.start_time.strftime('%H:%M')} - {entry.end_time.strftime('%H:%M')}"
+
+    # Pass data to the template
+    context = {
+        'week_start': week_start,
+        'week_days': week_days,
+        'rota_data': rota_data,
+    }
+    return render(request, 'rota/admin_weekly_rota.html', context)
+
+
+# Login View
 class AdminRedirectLoginView(auth_views.LoginView):
     """
     Custom login view that redirects admin users to the Django Admin dashboard.
     Regular users are redirected to their dashboard.
     """
-    template_name = 'rota/login.html'  # Path to the login template
+    template_name = 'rota/login.html' 
 
     def get_success_url(self):
         """
@@ -19,14 +50,14 @@ class AdminRedirectLoginView(auth_views.LoginView):
         Regular users go to the staff dashboard.
         """
         if self.request.user.is_superuser or self.request.user.is_staff:
-            return reverse_lazy('admin:index')  # Redirect admin to Django Admin
-        return reverse_lazy('staff_dashboard')  # Redirect regular users
+            return reverse_lazy('admin:index')  
+        return reverse_lazy('staff_dashboard')  
 
 
 @login_required
 def staff_dashboard(request):
     """
-    Staff dashboard: View current/future shifts and request days off.
+    Staff dashboard: Cane view their shifts.
     """
     today = datetime.date.today()
 
@@ -37,13 +68,11 @@ def staff_dashboard(request):
         requested_day = request.POST.get("requested_day")
         comment = request.POST.get("comment", "").strip()
 
-        # Validate input
         if not requested_day:
             return render(request, 'rota/staff_dashboard.html', {
                 'error': "Please select a day to request off."
             })
 
-        # Save the request
         Request.objects.create(
             user=request.user,
             requested_day=requested_day,
@@ -51,7 +80,6 @@ def staff_dashboard(request):
         )
         return redirect('staff_dashboard')
 
-    # Fetch existing requests
     requests = Request.objects.filter(user=request.user).order_by('-requested_day')
 
     return render(request, 'rota/staff_dashboard.html', {
@@ -62,11 +90,10 @@ def staff_dashboard(request):
 @login_required
 def completed_shifts(request):
     """
-    View to display completed shifts (past shifts) for the logged-in user.
+    Staff can view their previous worked shifts
     """
     today = datetime.date.today()
 
-    # Fetch past shifts for the logged-in user
     shifts = Rota.objects.filter(user=request.user, date__lt=today).order_by('-date')
 
     return render(request, 'rota/completed_shifts.html', {
@@ -77,16 +104,14 @@ def completed_shifts(request):
 @login_required
 def admin_staff_requests(request):
     """
-    Admin view to see all pending staff requests.
+    The admin can view pending requests 
     """
     if not request.user.is_staff and not request.user.is_superuser:
-        return redirect('staff_dashboard')  # Non-admins are redirected to their dashboard
+        return redirect('staff_dashboard') 
 
-    # Fetch all pending requests
     staff_requests = Request.objects.filter(status='Pending').order_by('-requested_day')
 
     if request.method == "POST":
-        # Process admin approval/rejection of requests
         request_id = request.POST.get('request_id')
         action = request.POST.get('action')
         admin_comment = request.POST.get('admin_comment', '')
@@ -109,7 +134,7 @@ def admin_staff_requests(request):
 @login_required
 def add_rota(request):
     """
-    View to add a new rota entry for staff members.
+    When the rota is created cannot have the same staff twice for the same date.
     """
     if request.method == "POST":
         user_id = request.POST.get("user_id")
@@ -119,7 +144,6 @@ def add_rota(request):
         end_time = request.POST.get("end_time")
 
         try:
-            # Attempt to create the rota
             Rota.objects.create(
                 user_id=user_id,
                 date=date,
@@ -131,7 +155,6 @@ def add_rota(request):
             return redirect('add_rota')
 
         except IntegrityError:
-            # Handle duplicate staff on the same date
             messages.error(request, "This staff member already has a shift for this date.")
             return redirect('add_rota')
 

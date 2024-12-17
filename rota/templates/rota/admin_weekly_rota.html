@@ -1,0 +1,42 @@
+{% extends 'rota/base.html' %}
+{% load rota_filters %}
+
+{% block title %}Weekly Rota{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Weekly Rota</h2>
+    <h4 class="text-center mb-4">Week Commencing: {{ week_start|date:"l, d M Y" }}</h4>
+
+    <div class="table-responsive">
+        <table class="table table-bordered text-center">
+            <!-- Table Header -->
+            <thead class="table-dark">
+                <tr>
+                    <th>Staff Name</th>
+                    {% for day in week_days %}
+                        <th>{{ day|date:"l" }}<br>{{ day|date:"d M" }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <!-- Table Body -->
+            <tbody>
+                {% for staff_name, days in rota_data.items %}
+                <tr>
+                    <td class="fw-bold">{{ staff_name }}</td>
+                    {% for day in week_days %}
+                        <td>
+                            {% if day in days %}
+                                {{ days|dict_key:day }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

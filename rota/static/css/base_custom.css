@@ -1,31 +1,29 @@
-/* Full page layout with flexbox */
+
 html, body {
     height: 100%;
     margin: 0;
     display: flex;
     flex-direction: column;
-    background-color: #f8f9fa; /* Light background */
+    background-color: #f8f9fa; 
 }
 
-/* Push footer to the bottom */
 main {
-    flex: 1; /* Take up remaining space */
-    padding: 20px; /* Add padding around content */
-    background-color: white; /* Content area background */
+    flex: 1; 
+    padding: 20px; 
+    background-color: white; 
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* Footer styling */
+
 .footer {
-    background-color: #004386 !important; /* Dark blue */
+    background-color: #004386 !important; 
     color: white;
     text-align: center;
     padding: 10px 0;
-    margin-top: auto; /* Push footer to the bottom */
+    margin-top: auto; 
 }
 
-/* Navbar styling */
 .custom-dark-blue {
     background-color: #004386 !important;
 }
@@ -39,12 +37,11 @@ main {
     color: #d9eaf7 !important;
 }
 
-/* Navbar Styling */
+
 .custom-dark-blue {
     background-color: #004386 !important;
 }
 
-/* Responsive content padding */
 .container {
     padding: 15px;
 }

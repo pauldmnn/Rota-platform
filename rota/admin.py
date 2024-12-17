@@ -11,7 +11,7 @@ class RotaAdmin(admin.ModelAdmin):
         """
         Display the day of the week for the rota date.
         """
-        return obj.date.strftime("%A")  # e.g., Monday, Tuesday
+        return obj.date.strftime("%A") 
     day.short_description = "Day of Week"
 
 
@@ -20,10 +20,10 @@ class RequestAdmin(admin.ModelAdmin):
     """
     Admin configuration for the Request model.
     """
-    list_display = ('user', 'requested_day', 'status', 'comment')  # Columns to display
-    list_filter = ('status', 'requested_day')  # Filters in the admin sidebar
-    search_fields = ('user__username',)  # Search bar to find requests by username
-    ordering = ('requested_day', 'user')  # Default ordering
+    list_display = ('user', 'requested_day', 'status', 'comment')  
+    list_filter = ('status', 'requested_day')  
+    search_fields = ('user__username',)  
+    ordering = ('requested_day', 'user') 
 
 
 

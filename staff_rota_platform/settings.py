@@ -109,8 +109,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LOGIN_URL = '/login/'  # Redirects to this page when authentication is required
-LOGIN_REDIRECT_URL = '/'  # Redirects to this URL after successful login
+LOGIN_URL = '/login/'  
+LOGIN_REDIRECT_URL = '/' 
 LOGOUT_REDIRECT_URL = '/login/'
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True

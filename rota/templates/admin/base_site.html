@@ -12,7 +12,9 @@
 {% endblock %}
 
 {% block branding %}
-    <h1 class="text-white">Admin Rota</h1>
+    <h1 class="text-white" id="site-name"><a href="{% url 'admin:index' %}">Admin Rota</a></h1>
 {% endblock %}
 
-
+{% block nav-global %}
+    <a href="{% url 'admin_weekly_rota' %}" class="weekly-rota-btn">View Weekly Rota</a>
+{% endblock %}
