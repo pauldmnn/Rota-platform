@@ -1,1 +1,1 @@
-web: gunicorn staff_rota_pplatform.wsgi
+web: gunicorn staff_rota_platform.wsgi
