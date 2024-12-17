@@ -1,5 +1,5 @@
 #header {
-    background-color: #343a40;
+    background-color: #004386; 
     color: white;
     padding: 10px 15px;
     display: flex;
@@ -22,14 +22,14 @@ body {
 }
 
 .model-admin h1 {
-    color: #3c3c3c;
+    color: #004386; 
     text-transform: uppercase;
     font-size: 24px;
     margin-bottom: 20px;
 }
 
 .table th {
-    background-color: #343a40;
+    background-color: #004386; 
     color: white;
 }
 

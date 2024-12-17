@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'this_15_my_s3cr3t_k3y_4_my_r0t4_pl4tf0rm'
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['8000-pauldmnn-rotaplatform-bswsshkpux0.ws.codeinstitute-ide.net',
                 '.herokuapp.com']
@@ -60,7 +60,7 @@ ROOT_URLCONF = 'staff_rota_platform.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates"],
+        'DIRS': [os.path.join(BASE_DIR, 'rota/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -111,6 +111,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LOGIN_URL = '/login/'  # Redirects to this page when authentication is required
 LOGIN_REDIRECT_URL = '/'  # Redirects to this URL after successful login
+LOGOUT_REDIRECT_URL = '/login/'
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 CSRF_TRUSTED_ORIGINS = [
     'https://8000-pauldmnn-rotaplatform-bswsshkpux0.ws.codeinstitute-ide.net',
@@ -133,7 +136,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 #STATIC_URL = '/static/'

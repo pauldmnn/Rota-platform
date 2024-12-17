@@ -1,32 +1,35 @@
-{% extends 'base.html' %}
-
-{% block title %}Completed Shifts{% endblock title %}
+{% extends 'rota/base.html' %}
+{% block title %}Completed Shifts{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1>Completed Shifts</h1>
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Completed Shifts</h1>
 
-    {% if completed_shifts %}
-    <table class="table table-striped mt-4">
-        <thead>
+    {% if shifts %}
+    <table class="table table-bordered table-striped mt-3">
+        <thead class="table-dark">
             <tr>
                 <th>Date</th>
-                <th>Day</th>
                 <th>Shift Type</th>
+                <th>Start Time</th>
+                <th>End Time</th>
             </tr>
         </thead>
         <tbody>
-            {% for shift in completed_shifts %}
+            {% for shift in shifts %}
             <tr>
                 <td>{{ shift.date }}</td>
-                <td>{{ shift.day }}</td>
                 <td>{{ shift.shift_type }}</td>
+                <td>{{ shift.start_time|default:"-" }}</td>
+                <td>{{ shift.end_time|default:"-" }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
     {% else %}
-    <div class="alert alert-info mt-4">You have no completed shifts.</div>
+    <div class="alert alert-info text-center mt-3">
+        You have no completed shifts yet.
+    </div>
     {% endif %}
 </div>
-{% endblock content %}
+{% endblock %}

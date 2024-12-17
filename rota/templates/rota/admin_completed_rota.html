@@ -1,0 +1,34 @@
+{% extends 'rota/base.html' %}
+
+{% block title %}Completed Rota{% endblock title %}
+
+{% block content %}
+<h1>Completed Rota ({{ start_of_week }} - {{ end_of_week }})</h1>
+
+{% if completed_rota %}
+<table class="table table-striped mt-3">
+    <thead>
+        <tr>
+            <th>Staff Member</th>
+            <th>Date</th>
+            <th>Shift Type</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for shift in completed_rota %}
+        <tr>
+            <td>{{ shift.user.username }}</td>
+            <td>{{ shift.date }}</td>
+            <td>{{ shift.shift_type }}</td>
+            <td>{{ shift.start_time|default:"-" }}</td>
+            <td>{{ shift.end_time|default:"-" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="alert alert-info">No shifts scheduled for this week.</div>
+{% endif %}
+{% endblock content %}

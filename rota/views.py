@@ -1,166 +1,138 @@
-from django.shortcuts import render, redirect
+from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.models import User
-from .models import Rota, Request
+from django.urls import reverse_lazy
+from django.shortcuts import render, redirect
+from .models import Request, Rota
 import datetime
 
-@login_required
-def index(request):
+# Custom Login View
+class AdminRedirectLoginView(auth_views.LoginView):
     """
-    Displays the rota for the logged-in user.
-    """
-    rotas = Rota.objects.filter(user=request.user).order_by('date')
-    return render(request, 'rota/index.html', {"rotas": rotas})
-
-# Login view
-def custom_login(request):
-    """
-    Handles user login.
-    Superusers are redirected to the admin panel.
+    Custom login view that redirects admin users to the Django Admin dashboard.
     Regular users are redirected to their dashboard.
     """
-    if request.method == 'POST':
-        form = AuthenticationForm(data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            # Redirect superusers to the admin panel
-            if user.is_superuser:
-                return redirect('/admin/')
-            # Redirect regular users to the dashboard
-            return redirect('dashboard')
-    else:
-        form = AuthenticationForm()
-    return render(request, 'rota/login.html', {'form': form})
+    template_name = 'rota/login.html'  # Path to the login template
 
-# Logout view
-def logout_view(request):
-    """
-    Logs the user out and redirects to the login page.
-    """
-    logout(request)
-    return redirect('login')
+    def get_success_url(self):
+        """
+        Redirect superusers or staff to the admin dashboard.
+        Regular users go to the staff dashboard.
+        """
+        if self.request.user.is_superuser or self.request.user.is_staff:
+            return reverse_lazy('admin:index')  # Redirect admin to Django Admin
+        return reverse_lazy('staff_dashboard')  # Redirect regular users
+
 
 @login_required
-def dashboard(request):
+def staff_dashboard(request):
     """
-    Displays future shifts for the logged-in user.
+    Staff dashboard: View current/future shifts and request days off.
     """
     today = datetime.date.today()
-    future_shifts = Rota.objects.filter(user=request.user, date__gte=today).order_by('date')
 
-    return render(request, "rota/dashboard.html", {"future_shifts": future_shifts})
+    shifts = Rota.objects.filter(user=request.user, date__gte=today).order_by('date')
 
+    # Handle form submission for requesting a day off
+    if request.method == "POST":
+        requested_day = request.POST.get("requested_day")
+        comment = request.POST.get("comment", "").strip()
+
+        # Validate input
+        if not requested_day:
+            return render(request, 'rota/staff_dashboard.html', {
+                'error': "Please select a day to request off."
+            })
+
+        # Save the request
+        Request.objects.create(
+            user=request.user,
+            requested_day=requested_day,
+            comment=comment
+        )
+        return redirect('staff_dashboard')
+
+    # Fetch existing requests
+    requests = Request.objects.filter(user=request.user).order_by('-requested_day')
+
+    return render(request, 'rota/staff_dashboard.html', {
+        'shifts': shifts,
+        'requests': requests
+    })
 
 @login_required
 def completed_shifts(request):
     """
-    Displays completed shifts for the logged-in user.
+    View to display completed shifts (past shifts) for the logged-in user.
     """
     today = datetime.date.today()
-    completed_shifts = Rota.objects.filter(user=request.user, date__lt=today).order_by('-date')
 
-    return render(request, "rota/completed_shifts.html", {"completed_shifts": completed_shifts})
+    # Fetch past shifts for the logged-in user
+    shifts = Rota.objects.filter(user=request.user, date__lt=today).order_by('-date')
+
+    return render(request, 'rota/completed_shifts.html', {
+        'shifts': shifts
+    })
 
 
-# Admin manage rota view
 @login_required
-def manage_rota(request):
-    if not request.user.is_staff:
-        return render(request, "rota/not_authorized.html")
+def admin_staff_requests(request):
+    """
+    Admin view to see all pending staff requests.
+    """
+    if not request.user.is_staff and not request.user.is_superuser:
+        return redirect('staff_dashboard')  # Non-admins are redirected to their dashboard
 
-    if request.method == 'POST':
+    # Fetch all pending requests
+    staff_requests = Request.objects.filter(status='Pending').order_by('-requested_day')
+
+    if request.method == "POST":
+        # Process admin approval/rejection of requests
+        request_id = request.POST.get('request_id')
+        action = request.POST.get('action')
+        admin_comment = request.POST.get('admin_comment', '')
+
+        req = Request.objects.get(id=request_id)
+        if action == "approve":
+            req.status = "Approved"
+        elif action == "reject":
+            req.status = "Rejected"
+            req.admin_comment = admin_comment
+        req.save()
+
+        return redirect('admin_staff_requests')
+
+    return render(request, 'rota/admin_staff_requests.html', {
+        'staff_requests': staff_requests
+    })
+
+
+@login_required
+def add_rota(request):
+    """
+    View to add a new rota entry for staff members.
+    """
+    if request.method == "POST":
         user_id = request.POST.get("user_id")
         date = request.POST.get("date")
         shift_type = request.POST.get("shift_type")
-
-        # Validate fields
-        if not date:
-            return render(request, "rota/manage_rota.html", {
-                "rotas": Rota.objects.all(),
-                "users": User.objects.all(),
-                "error": "Date is required."
-            })
+        start_time = request.POST.get("start_time")
+        end_time = request.POST.get("end_time")
 
         try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            return render(request, "rota/manage_rota.html", {
-                "rotas": Rota.objects.all(),
-                "users": User.objects.all(),
-                "error": "Selected user does not exist."
-            })
+            # Attempt to create the rota
+            Rota.objects.create(
+                user_id=user_id,
+                date=date,
+                shift_type=shift_type,
+                start_time=start_time,
+                end_time=end_time,
+            )
+            messages.success(request, "Rota successfully added.")
+            return redirect('add_rota')
 
-        # Check for duplicate rota
-        existing_rota = Rota.objects.filter(user=user, date=date).exists()
-        if existing_rota:
-            return render(request, "rota/manage_rota.html", {
-                "rotas": Rota.objects.all(),
-                "users": User.objects.all(),
-                "error": "This user is already scheduled for this date."
-            })
+        except IntegrityError:
+            # Handle duplicate staff on the same date
+            messages.error(request, "This staff member already has a shift for this date.")
+            return redirect('add_rota')
 
-        # Create the rota
-        Rota.objects.create(
-            user=user,
-            date=date,
-            shift_type=shift_type
-        )
-        return redirect('manage_rota')
-
-    rotas = Rota.objects.all().order_by('date')
-    users = User.objects.all()
-    return render(request, "rota/manage_rota.html", {"rotas": rotas, "users": users})
-
-# Staff request day view
-@login_required
-def request_day(request):
-    """
-    Allows staff to request specific days.
-    Only logged-in non-admin users can access this view.
-    """
-    if request.user.is_staff:  # Admins shouldn't access this view
-        return redirect('manage_requests')
-
-    if request.method == 'POST':
-        requested_day = request.POST.get("requested_day")
-        # Check for duplicate requests
-        existing_request = Request.objects.filter(user=request.user, requested_day=requested_day).exists()
-        if existing_request:
-            return render(request, "rota/request_day.html", {"error": "You have already requested this day."})
-
-        # Create the request
-        Request.objects.create(user=request.user, requested_day=requested_day)
-        return redirect('dashboard')
-
-    return render(request, "rota/request_day.html")
-
-# Admin manage requests view
-@login_required
-def manage_requests(request):
-    """
-    Allows admins to view and respond to staff requests.
-    """
-    if not request.user.is_staff:  # Ensure only admins access this view
-        return redirect('dashboard')
-
-    if request.method == 'POST':
-        request_id = request.POST.get("request_id")
-        action = request.POST.get("action")
-        comment = request.POST.get("comment", "")
-
-        try:
-            staff_request = Request.objects.get(id=request_id)
-            if action == "approve":
-                staff_request.status = "Approved"
-            elif action == "refuse":
-                staff_request.status = "Refused"
-                staff_request.comment = comment
-            staff_request.save()
-        except Request.DoesNotExist:
-            pass  # Handle invalid request IDs if necessary
-
-    requests = Request.objects.filter(status="Pending").order_by('requested_day')
-    return render(request, "rota/manage_requests.html", {"requests": requests})
+    return render(request, 'rota/add_rota.html')

@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.contrib.admin.sites import AdminSite
 from .models import Rota, Request
 
 @admin.register(Rota)
@@ -27,19 +26,5 @@ class RequestAdmin(admin.ModelAdmin):
     ordering = ('requested_day', 'user')  # Default ordering
 
 
-from django.contrib.admin import AdminSite
-from django.contrib import admin
 
-class CustomAdminSite(AdminSite):
-    site_header = "Rota Management Admin"
-    site_title = "Rota Platform Admin"
-    index_title = "Welcome to Rota Platform Admin"
-
-    def each_context(self, request):
-        context = super().each_context(request)
-        # Inject your custom CSS file
-        context["css_files"] = ["/static/rota/admin.css"]  # Ensure the path matches your static setup
-        return context
-
-admin.site = CustomAdminSite(name='custom_admin')
 

@@ -1,0 +1,28 @@
+{% extends 'rota/base.html' %}
+
+{% block title %}Manage Requests{% endblock title %}
+
+{% block content %}
+<h1>Manage Day-Off Requests</h1>
+
+{% if pending_requests %}
+<form method="post">
+    {% csrf_token %}
+    {% for request in pending_requests %}
+    <div class="border p-3 mb-3">
+        <p><strong>{{ request.user.username }}</strong> requested <strong>{{ request.requested_day }}</strong></p>
+        <p>Comment: {{ request.comment|default:"-" }}</p>
+        <div class="mb-2">
+            <label for="admin_comment_{{ request.id }}" class="form-label">Admin Comment (Optional)</label>
+            <textarea name="admin_comment" id="admin_comment_{{ request.id }}" class="form-control" rows="2"></textarea>
+        </div>
+        <input type="hidden" name="request_id" value="{{ request.id }}">
+        <button type="submit" name="action" value="approve" class="btn btn-success me-2">Approve</button>
+        <button type="submit" name="action" value="reject" class="btn btn-danger">Reject</button>
+    </div>
+    {% endfor %}
+</form>
+{% else %}
+<div class="alert alert-info">There are no pending requests.</div>
+{% endif %}
+{% endblock content %}

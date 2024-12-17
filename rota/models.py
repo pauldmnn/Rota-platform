@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import date
 
-# Shift type choices
+# Shift Type Choices
 SHIFT_CHOICES = [
     ("Long Day", "Long Day"),
     ("Early", "Early"),
@@ -11,42 +11,42 @@ SHIFT_CHOICES = [
     ("Custom", "Custom"),
 ]
 
+
 class Rota(models.Model):
     """
-    Rota model represents the work schedule for staff.
+    Model to store shift details for staff members.
     """
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Link to User model
-    date = models.DateField(default=date(2024, 1, 1))  # The specific date for the rota
-    shift_type = models.CharField(max_length=10, choices=SHIFT_CHOICES, default="Long Day")  # Shift type
-    start_time = models.TimeField(blank=True, null=True)  # Optional custom start time
-    end_time = models.TimeField(blank=True, null=True)  # Optional custom end time
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Staff member
+    date = models.DateField()  # Date of the shift
+    shift_type = models.CharField(
+        max_length=20, choices=SHIFT_CHOICES, default="Long Day"
+    )  # Type of shift
+    start_time = models.TimeField(blank=True, null=True)  # Optional start time for custom shifts
+    end_time = models.TimeField(blank=True, null=True)  # Optional end time for custom shifts
 
-    @property
-    def day(self):
-        """
-        Automatically calculate the day of the week based on the date.
-        """
-        return self.date.strftime("%A")  # e.g., Monday, Tuesday
+    class Meta:
+        unique_together = ('user', 'date')
+
 
     def __str__(self):
         if self.shift_type == "Custom" and self.start_time and self.end_time:
-            return f"{self.user.username}: {self.date} - {self.shift_type} ({self.start_time} to {self.end_time})"
-        return f"{self.user.username}: {self.date} - {self.shift_type}"
+            return f"{self.user.username} - {self.date} - Custom ({self.start_time} to {self.end_time})"
+        return f"{self.user.username} - {self.date} - {self.shift_type}"
 
 
 class Request(models.Model):
     """
-    Request model allows staff to request specific days to work.
+    Model for staff day-off requests.
     """
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Link to User model
-    requested_day = models.DateField()  # Date requested by the user
-    status = models.CharField(max_length=10, choices=[
-            ("Pending", "Pending"),
-            ("Approved", "Approved"),
-            ("Refused", "Refused"),
-        ], default="Pending"
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Staff member making the request
+    requested_day = models.DateField()  # Day they are requesting off
+    comment = models.TextField(blank=True, null=True)  # Staff comment for the request
+    status = models.CharField(
+        max_length=10,
+        choices=[("Pending", "Pending"), ("Approved", "Approved"), ("Rejected", "Rejected")],
+        default="Pending",
     )  # Status of the request
-    comment = models.TextField(blank=True, null=True)  # Admin comment (e.g., reason for refusal)
+    admin_comment = models.TextField(blank=True, null=True)  # Admin's reason for rejection
 
     def __str__(self):
-        return f"{self.user.username}: {self.requested_day} ({self.status})"
+        return f"{self.user.username} - {self.requested_day} ({self.status})"
