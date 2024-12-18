@@ -1,0 +1,37 @@
+{% extends 'rota/base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Your Profile</h2>
+
+    <h3 class="mt-4">Your Requests</h3>
+    {% if user_requests %}
+        <table class="table table-bordered table-striped mt-4">
+            <thead class="table-dark">
+                <tr>
+                    <th>Date Requested</th>
+                    <th>Comment</th>
+                    <th>Status</th>
+                    <th>Admin Reply</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in user_requests %}
+                    <tr>
+                        <td>{{ request.date }}</td>
+                        <td>{{ request.comment|default:"No comment provided" }}</td>
+                        <td>{{ request.status }}</td>
+                        <td>{{ request.admin_comment|default:"No reply yet" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-info mt-3" role="alert">
+            You have no requests.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

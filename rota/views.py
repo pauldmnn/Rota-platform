@@ -47,20 +47,20 @@ def admin_create_rota(request):
 @user_passes_test(lambda u: u.is_staff)
 def admin_dashboard(request):
     """
-    Admin dashboard displaying pending staff requests.
+    Admin dashboard displaying all pending staff requests.
     """
     # Fetch all pending requests
-    pending_requests = Request.objects.filter(status="Pending").order_by('-created_at')
+    staff_requests = Request.objects.filter(status='Pending').order_by('-created_at')
 
     return render(request, 'rota/admin_dashboard.html', {
-        'pending_requests': pending_requests
+        'staff_requests': staff_requests
     })
 
 
 @user_passes_test(lambda u: u.is_staff)
 def admin_manage_requests(request):
     """
-    Handles the approval or rejection of staff requests.
+    Handles approval or rejection of staff requests.
     """
     if request.method == "POST":
         request_id = request.POST.get("request_id")
@@ -69,16 +69,17 @@ def admin_manage_requests(request):
 
         if action == "approve":
             staff_request.status = "Approved"
-            messages.success(request, f"Request for {staff_request.date} has been approved.")
+            staff_request.admin_comment = "Your request has been approved."
         elif action == "reject":
             staff_request.status = "Rejected"
-            admin_comment = request.POST.get("admin_comment", "No comment provided")
-            staff_request.admin_comment = admin_comment
-            messages.error(request, f"Request for {staff_request.date} has been rejected.")
+            staff_request.admin_comment = request.POST.get("admin_comment", "Your request has been rejected.")
+
         staff_request.save()
 
-    return redirect('admin_dashboard')
+        # Add a feedback message for the user
+        messages.add_message(request, messages.SUCCESS, f"Request reply has been sent to {staff_request.user.username}.")
 
+    return redirect('admin_dashboard')
 
 @user_passes_test(lambda u: u.is_staff)
 def admin_weekly_rota(request):
@@ -159,6 +160,26 @@ def user_login(request):
 
     return render(request, 'rota/login.html')
 
+
+@login_required
+def staff_profile(request):
+    """
+    Displays the staff profile with request replies and other details.
+    """
+    user_requests = Request.objects.filter(user=request.user).order_by('-created_at')
+
+    return render(request, 'rota/staff_profile.html', {
+        'user_requests': user_requests
+    })
+
+def custom_logout(request):
+    """
+    Logs out the user and redirects to the login page.
+    """
+    logout(request)
+    return redirect('login')
+
+
 @login_required
 def completed_shifts(request):
     """
@@ -176,12 +197,16 @@ def completed_shifts(request):
 def request_day_off(request):
     """
     Allows staff to request a day off.
+    Admins are restricted from accessing this view.
     """
+    if request.user.is_staff:
+        return redirect('admin_dashboard')  # Redirect admins to their dashboard
+
     if request.method == "POST":
         form = RequestForm(request.POST)
         if form.is_valid():
             request_obj = form.save(commit=False)
-            request_obj.user = request.user  # Associate the request with the logged-in user
+            request_obj.user = request.user
             request_obj.save()
             messages.success(request, "Your request has been submitted successfully.")
             return redirect('staff_dashboard')
@@ -189,10 +214,3 @@ def request_day_off(request):
         form = RequestForm()
 
     return render(request, 'rota/request_day_off.html', {'form': form})
-
-def custom_logout(request):
-    """
-    Logs out the user and redirects to the login page.
-    """
-    logout(request)
-    return redirect('login')

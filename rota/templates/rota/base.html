@@ -35,6 +35,11 @@
                             <a class="btn btn-primary" href="{% url 'login' %}">Login</a>
                         </li>
                     {% endif %}
+                    {% if user.is_staff %}
+                        <a href="{% url 'admin_dashboard' %}" class="btn btn-warning">Admin Dashboard</a>
+                    {% else %}
+                        <a href="{% url 'staff_dashboard' %}" class="btn btn-primary">User Dashboard</a>
+                    {% endif %}
                 </ul>
             </div>
         </div>
