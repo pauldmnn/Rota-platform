@@ -6,9 +6,18 @@ from django.utils import timezone
 from datetime import timedelta
 from .models import Rota, Request, User
 
+
 # Check if the user is an admin
 def is_admin(user):
     return user.is_staff
+
+@user_passes_test(is_admin)
+def admin_redirect_login_view(request):
+    """
+    Redirect authenticated admin users to the admin dashboard.
+    """
+    return redirect('admin_dashboard')
+
 
 # Admin login view
 def admin_login(request):

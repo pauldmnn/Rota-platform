@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'this_15_my_s3cr3t_k3y_4_my_r0t4_pl4tf0rm'
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['8000-pauldmnn-rotaplatform-bswsshkpux0.ws.codeinstitute-ide.net',
                 '.herokuapp.com']

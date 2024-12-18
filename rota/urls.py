@@ -1,10 +1,12 @@
 from django.urls import path
-from . import views
+from rota import views
+
 
 urlpatterns = [
     # Admin URLs
     path('admin/login/', views.admin_login, name='admin_login'),  # Custom admin login
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),  # Admin dashboard
+    path('admin/redirect/', lambda request: __import__('rota.views').views.admin_redirect_login_view(request), name='admin_redirect'),
     path('admin/weekly_rota/', views.admin_weekly_rota, name='admin_weekly_rota'),  # Weekly rota view
     path('admin/update_rota/<int:rota_id>/', views.update_rota, name='update_rota'),  # Update rota
     path('admin/logout/', views.admin_logout, name='admin_logout'),  # Admin logout
