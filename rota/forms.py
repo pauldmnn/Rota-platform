@@ -1,5 +1,6 @@
 from django import forms
 from .models import Rota, Request, StaffProfile
+from django.contrib.auth.models import User
 
 class RotaForm(forms.ModelForm):
     """
@@ -46,6 +47,7 @@ class StaffProfileForm(forms.ModelForm):
         model = StaffProfile
         fields = ['full_name', 'address', 'phone_number']
         widgets = {
+            'full_name': forms.TextInput(attrs={'class': 'form-control'}),
             'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
         }

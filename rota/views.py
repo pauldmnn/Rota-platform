@@ -34,7 +34,7 @@ def admin_login(request):
 @user_passes_test(lambda u: u.is_staff)
 def create_staff_profile(request):
     """
-    Allows admin to create a staff profile.
+    Allows only the admin to create a staff profile.
     """
     if request.method == "POST":
         user_form = StaffCreationForm(request.POST)
@@ -52,7 +52,7 @@ def create_staff_profile(request):
             profile.save()
 
             messages.success(request, f"Profile for {user.username} created successfully!")
-            return redirect('admin_dashboard')  # Adjust this to the appropriate admin page
+            return redirect('admin_dashboard')  # Adjust to your admin page
     else:
         user_form = StaffCreationForm()
         profile_form = StaffProfileForm()
@@ -60,6 +60,18 @@ def create_staff_profile(request):
     return render(request, 'rota/create_staff_profile.html', {
         'user_form': user_form,
         'profile_form': profile_form,
+    })
+
+
+@login_required
+def view_staff_profile(request):
+    """
+    Allows staff to view their profile details entered by the admin.
+    """
+    profile = request.user.profile  # Access the related StaffProfile instance
+
+    return render(request, 'rota/view_staff_profile.html', {
+        'profile': profile
     })
 
 

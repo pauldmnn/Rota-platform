@@ -5,6 +5,7 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('admin/create_staff_profile/', views.create_staff_profile, name='create_staff_profile'),
+    path('view_profile/', views.view_staff_profile, name='view_staff_profile'),
     path('', views.staff_dashboard, name='staff_dashboard'),
     path('completed_shifts/', views.completed_shifts, name='completed_shifts'),
     path('request_day_off/', views.request_day_off, name='request_day_off'),
