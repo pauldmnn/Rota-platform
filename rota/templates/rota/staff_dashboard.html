@@ -18,5 +18,8 @@
     {% else %}
         <p>No upcoming shifts assigned.</p>
     {% endif %}
+    <div class="mt-4">
+        <a href="{% url 'request_day_off' %}" class="btn btn-primary mt-3">Request Day Off</a>
+    </div>
 </div>
 {% endblock %}

@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.utils import timezone
 from .models import Rota, Request, User 
 from django.utils.timezone import now
-from .forms import RotaForm
+from .forms import RotaForm, RequestForm
 
 
 def admin_login(request):
@@ -178,18 +178,17 @@ def request_day_off(request):
     Allows staff to request a day off.
     """
     if request.method == "POST":
-        requested_date = request.POST.get("requested_date")
-        comment = request.POST.get("comment", "")
-        existing_request = Request.objects.filter(user=request.user, date=requested_date).exists()
+        form = RequestForm(request.POST)
+        if form.is_valid():
+            request_obj = form.save(commit=False)
+            request_obj.user = request.user  # Associate the request with the logged-in user
+            request_obj.save()
+            messages.success(request, "Your request has been submitted successfully.")
+            return redirect('staff_dashboard')
+    else:
+        form = RequestForm()
 
-        if existing_request:
-            messages.error(request, "You have already requested this day off.")
-        else:
-            Request.objects.create(user=request.user, date=requested_date, comment=comment)
-            messages.success(request, "Day-off request submitted successfully.")
-
-    return render(request, 'rota/request_day_off.html')
-
+    return render(request, 'rota/request_day_off.html', {'form': form})
 
 def custom_logout(request):
     """

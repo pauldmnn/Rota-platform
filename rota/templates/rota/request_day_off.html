@@ -1,20 +1,23 @@
 {% extends 'rota/base.html' %}
+
 {% block title %}Request Day Off{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2>Request a Day Off</h2>
-    <form method="post">
+<div class="container mt-5">
+    <h2 class="text-center">Request Day Off</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" class="mt-4">
         {% csrf_token %}
-        <div class="mb-3">
-            <label for="requested_day">Date</label>
-            <input type="date" name="requested_day" id="requested_day" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label for="comment">Reason (Optional)</label>
-            <textarea name="comment" id="comment" class="form-control"></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary w-100">Submit Request</button>
     </form>
 </div>
 {% endblock %}
