@@ -1,0 +1,20 @@
+{% extends 'rota/base.html' %}
+{% block title %}Request Day Off{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Request a Day Off</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="requested_day">Date</label>
+            <input type="date" name="requested_day" id="requested_day" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="comment">Reason (Optional)</label>
+            <textarea name="comment" id="comment" class="form-control"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}
