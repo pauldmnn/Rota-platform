@@ -1,16 +1,13 @@
 {% extends 'rota/base.html' %}
-{% load rota_filters %}
-
 {% block title %}Weekly Rota{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <h2 class="text-center">Weekly Rota</h2>
-    <h4 class="text-center mb-4">Week Commencing: {{ week_start|date:"l, d M Y" }}</h4>
+    <h4 class="text-center">Week Commencing: {{ week_start|date:"l, d M Y" }}</h4>
 
     <div class="table-responsive">
-        <table class="table table-bordered text-center">
-            <!-- Table Header -->
+        <table class="table table-bordered">
             <thead class="table-dark">
                 <tr>
                     <th>Staff Name</th>
@@ -19,15 +16,14 @@
                     {% endfor %}
                 </tr>
             </thead>
-            <!-- Table Body -->
             <tbody>
                 {% for staff_name, days in rota_data.items %}
                 <tr>
-                    <td class="fw-bold">{{ staff_name }}</td>
+                    <td>{{ staff_name }}</td>
                     {% for day in week_days %}
-                        <td>
+                        <td {% if day in days and days[day].is_updated %} style="background-color: red; color: white;" {% endif %}>
                             {% if day in days %}
-                                {{ days|dict_key:day }}
+                                {{ days[day].shift }}
                             {% else %}
                                 -
                             {% endif %}

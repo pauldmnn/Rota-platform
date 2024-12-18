@@ -23,6 +23,7 @@ class Rota(models.Model):
     )  
     start_time = models.TimeField(blank=True, null=True)  
     end_time = models.TimeField(blank=True, null=True) 
+    is_updated = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('user', 'date')

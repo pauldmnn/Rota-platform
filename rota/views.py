@@ -1,10 +1,64 @@
 from django.contrib.auth import views as auth_views
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse_lazy
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Request, Rota
 import datetime
 from datetime import timedelta
+from django.contrib import messages
+
+
+def is_admin(user):
+    return user.is_staff
+
+@login_required
+@user_passes_test(is_admin)
+def admin_dashboard(request):
+    return render(request, 'rota/admin_dashboard.html')
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_weekly_rota(request):
+    today = timezone.now().date()
+    week_start = today - timedelta(days=today.weekday())  # Start of the week (Monday)
+    week_days = [(week_start + timedelta(days=i)) for i in range(7)]
+
+    rota_entries = Rota.objects.filter(date__range=(week_start, week_start + timedelta(days=6)))
+
+    # Organize rota data into a structured format
+    rota_data = {}
+    for entry in rota_entries:
+        if entry.user.username not in rota_data:
+            rota_data[entry.user.username] = {}
+        rota_data[entry.user.username][entry.date] = {
+            'shift': f"{entry.start_time} - {entry.end_time}",
+            'is_updated': entry.is_updated,
+        }
+
+    return render(request, 'rota/admin_weekly_rota.html', {
+        'week_start': week_start,
+        'week_days': week_days,
+        'rota_data': rota_data,
+    })
+
+
+@login_required
+@user_passes_test(is_admin)
+def update_rota(request, rota_id):
+    rota_entry = get_object_or_404(Rota, id=rota_id)
+
+    if request.method == 'POST':
+        rota_entry.shift_type = request.POST.get('shift_type', rota_entry.shift_type)
+        rota_entry.start_time = request.POST.get('start_time', rota_entry.start_time)
+        rota_entry.end_time = request.POST.get('end_time', rota_entry.end_time)
+        rota_entry.is_updated = True
+        rota_entry.save()
+        messages.success(request, 'Rota updated successfully.')
+        return redirect('admin_weekly_rota')
+
+    return render(request, 'rota/update_rota.html', {'rota_entry': rota_entry})
+
 
 
 @login_required

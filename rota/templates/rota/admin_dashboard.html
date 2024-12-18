@@ -1,0 +1,9 @@
+{% extends 'rota/base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Welcome to the Admin Dashboard</h2>
+    <a href="{% url 'admin_weekly_rota' %}" class="btn btn-primary">View Weekly Rota</a>
+</div>
+{% endblock %}
