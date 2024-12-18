@@ -1,9 +1,9 @@
 {% extends 'rota/base.html' %}
-{% block title %}Admin Login{% endblock %}
+{% block title %}Login{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="text-center">Admin Login</h2>
+    <h2 class="text-center">User Login</h2>
     {% if messages %}
         {% for message in messages %}
             <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
@@ -23,5 +23,10 @@
         </div>
         <button type="submit" class="btn btn-primary w-100">Login</button>
     </form>
+
+    <div class="text-center mt-4">
+        <!-- Admin Login Button -->
+        <a href="{% url 'admin_login' %}" class="btn btn-secondary">Admin Login</a>
+    </div>
 </div>
 {% endblock %}

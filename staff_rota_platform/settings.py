@@ -35,7 +35,6 @@ ALLOWED_HOSTS = ['8000-pauldmnn-rotaplatform-bswsshkpux0.ws.codeinstitute-ide.ne
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -109,7 +108,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LOGIN_URL = '/admin/login/' 
+LOGIN_URL = '/login/' 
 LOGIN_REDIRECT_URL = '/' 
 LOGOUT_REDIRECT_URL = '/login/'
 
