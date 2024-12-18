@@ -1,0 +1,46 @@
+{% extends 'rota/base.html' %}
+
+{% block title %}Weekly Rota{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Weekly Rota</h2>
+    <h4 class="text-center">Week Commencing: {{ week_start }} - {{ week_end }}</h4>
+
+    {% if rota %}
+        <table class="table table-bordered table-striped mt-4">
+            <thead class="table-dark">
+                <tr>
+                    <th>Staff Name</th>
+                    {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+                        <th>{{ day }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for user, shifts in rota.items %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        {% for shift in shifts %}
+                            <td>
+                                {% if shift %}
+                                    {{ shift.shift_type }}<br>
+                                    {% if shift.start_time and shift.end_time %}
+                                        {{ shift.start_time }} - {{ shift.end_time }}
+                                    {% endif %}
+                                {% else %}
+                                    Off
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-info mt-4" role="alert">
+            No rota data available for this week.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

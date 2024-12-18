@@ -1,35 +1,52 @@
 {% extends 'rota/base.html' %}
+
 {% block title %}Completed Shifts{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="text-center mb-4">Completed Shifts</h1>
+    <h2 class="text-center">Completed Shifts</h2>
 
     {% if shifts %}
-    <table class="table table-bordered table-striped mt-3">
-        <thead class="table-dark">
-            <tr>
-                <th>Date</th>
-                <th>Shift Type</th>
-                <th>Start Time</th>
-                <th>End Time</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for shift in shifts %}
-            <tr>
-                <td>{{ shift.date }}</td>
-                <td>{{ shift.shift_type }}</td>
-                <td>{{ shift.start_time|default:"-" }}</td>
-                <td>{{ shift.end_time|default:"-" }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <table class="table table-bordered table-striped mt-4">
+            <thead class="table-dark">
+                <tr>
+                    <th>Date</th>
+                    <th>Shift Type</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for shift in shifts %}
+                    <tr>
+                        <td>{{ shift.date }}</td>
+                        <td>{{ shift.shift_type }}</td>
+                        <td>
+                            {% if shift.start_time %}
+                                {{ shift.start_time }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if shift.end_time %}
+                                {{ shift.end_time }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     {% else %}
-    <div class="alert alert-info text-center mt-3">
-        You have no completed shifts yet.
-    </div>
+        <div class="alert alert-info mt-4" role="alert">
+            No completed shifts to display.
+        </div>
     {% endif %}
+
+    <div class="text-center mt-4">
+        <a href="{% url 'staff_dashboard' %}" class="btn btn-primary">Back to Dashboard</a>
+    </div>
 </div>
 {% endblock %}

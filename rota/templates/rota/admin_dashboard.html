@@ -1,16 +1,44 @@
 {% extends 'rota/base.html' %}
+
 {% block title %}Admin Dashboard{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2 class="text-center">Welcome to the Admin Dashboard</h2>
-    <div class="row mt-4">
-        <div class="col-md-6">
-            <a href="{% url 'admin_weekly_rota' %}" class="btn btn-primary w-100">View Weekly Rota</a>
+<div class="container mt-5">
+    <h2 class="text-center">Admin Dashboard</h2>
+
+    <h3 class="mt-4">Pending Staff Requests</h3>
+    {% if pending_requests %}
+        <table class="table table-bordered table-striped mt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th>Staff Name</th>
+                    <th>Requested Date</th>
+                    <th>Comment</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in pending_requests %}
+                    <tr>
+                        <td>{{ request.user.username }}</td>
+                        <td>{{ request.date }}</td>
+                        <td>{{ request.comment|default:"No comment provided" }}</td>
+                        <td>
+                            <form method="post" action="{% url 'admin_manage_requests' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="request_id" value="{{ request.id }}">
+                                <button type="submit" name="action" value="approve" class="btn btn-success btn-sm">Approve</button>
+                                <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm">Reject</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-info mt-3" role="alert">
+            No pending requests at the moment.
         </div>
-        <div class="col-md-6">
-            <a href="{% url 'admin_manage_requests' %}" class="btn btn-secondary w-100">Manage Requests</a>
-        </div>
-    </div>
+    {% endif %}
 </div>
 {% endblock %}

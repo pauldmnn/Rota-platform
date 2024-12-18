@@ -36,18 +36,19 @@ class Rota(models.Model):
 
 # Staff making request to be off or work certain days
 class Request(models.Model):
-    """
-    Model for staff day-off requests.
-    """
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  
-    requested_day = models.DateField() 
-    comment = models.TextField(blank=True, null=True)  
-    status = models.CharField(
-        max_length=10,
-        choices=[("Pending", "Pending"), ("Approved", "Approved"), ("Rejected", "Rejected")],
-        default="Pending",
-    )  
-    admin_comment = models.TextField(blank=True, null=True) 
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='requests')
+    date = models.DateField()
+    comment = models.TextField(blank=True, null=True)  # Staff-provided comment
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
+    admin_comment = models.TextField(blank=True, null=True)  # Admin response/comment
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.requested_day} ({self.status})"
+        return f"{self.user.username} - {self.date} ({self.status})"
+

@@ -3,7 +3,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.utils import timezone
-from .models import Rota, Request, User  # Replace with your actual model names
+from .models import Rota, Request, User 
+from django.utils.timezone import now
+from .forms import RotaForm
 
 
 def admin_login(request):
@@ -17,75 +19,92 @@ def admin_login(request):
 
         if user is not None and user.is_staff:  # Ensure the user is a staff/admin
             login(request, user)
-            return redirect('admin_dashboard')  # Redirect to the custom admin dashboard
+
+            # Redirect superusers to the rota creation page
+            if user.is_superuser:
+                return redirect('admin_create_rota')
+            else:
+                return redirect('admin_dashboard')  # Redirect other staff to the admin dashboard
         else:
             messages.error(request, "Invalid credentials or you do not have admin access.")
     return render(request, 'rota/admin_login.html')
 
+@user_passes_test(lambda u: u.is_staff)
+def admin_create_rota(request):
+    """
+    Allows admin/superuser to create a new rota.
+    """
+    if request.method == "POST":
+        form = RotaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_dashboard')  # Redirect to dashboard after rota creation
+    else:
+        form = RotaForm()
+
+    return render(request, 'rota/admin_create_rota.html', {'form': form})
 
 @user_passes_test(lambda u: u.is_staff)
 def admin_dashboard(request):
     """
-    Displays the admin dashboard.
+    Admin dashboard displaying pending staff requests.
     """
-    return render(request, 'rota/admin_dashboard.html')
+    # Fetch all pending requests
+    pending_requests = Request.objects.filter(status="Pending").order_by('-created_at')
+
+    return render(request, 'rota/admin_dashboard.html', {
+        'pending_requests': pending_requests
+    })
 
 
 @user_passes_test(lambda u: u.is_staff)
 def admin_manage_requests(request):
     """
-    View and handle day-off requests from staff.
+    Handles the approval or rejection of staff requests.
     """
-    requests = Request.objects.filter(status='Pending').order_by('-created_at')
     if request.method == "POST":
         request_id = request.POST.get("request_id")
         action = request.POST.get("action")
-        admin_comment = request.POST.get("admin_comment", "")
+        staff_request = get_object_or_404(Request, id=request_id)
 
-        day_off_request = get_object_or_404(Request, id=request_id)
         if action == "approve":
-            day_off_request.status = "Approved"
+            staff_request.status = "Approved"
+            messages.success(request, f"Request for {staff_request.date} has been approved.")
         elif action == "reject":
-            day_off_request.status = "Rejected"
-            day_off_request.admin_comment = admin_comment
-        day_off_request.save()
+            staff_request.status = "Rejected"
+            admin_comment = request.POST.get("admin_comment", "No comment provided")
+            staff_request.admin_comment = admin_comment
+            messages.error(request, f"Request for {staff_request.date} has been rejected.")
+        staff_request.save()
 
-    return render(request, 'rota/manage_requests.html', {'requests': requests})
+    return redirect('admin_dashboard')
 
 
 @user_passes_test(lambda u: u.is_staff)
 def admin_weekly_rota(request):
     """
-    Displays the rota for the current week.
+    Displays the rota for the current week in a table format.
     """
-    today = timezone.now().date()
-    start_of_week = today - timezone.timedelta(days=today.weekday())
-    end_of_week = start_of_week + timezone.timedelta(days=6)
-    rota = Rota.objects.filter(date__range=[start_of_week, end_of_week]).order_by('date', 'user')
+    today = now().date()
+    start_of_week = today - timezone(days=today.weekday())  # Get Monday of the current week
+    end_of_week = start_of_week + timezone(days=6)         # Get Sunday of the current week
+
+    rota_data = {}
+    staff = Rota.objects.filter(date__range=[start_of_week, end_of_week]).order_by('user', 'date')
+
+    for shift in staff:
+        if shift.user not in rota_data:
+            rota_data[shift.user] = [None] * 7  # Initialize list for 7 days of the week
+        index = (shift.date - start_of_week).days  # Calculate day index
+        rota_data[shift.user][index] = shift
 
     return render(request, 'rota/weekly_rota.html', {
-        'rota': rota,
+        'rota': rota_data,
         'week_start': start_of_week,
         'week_end': end_of_week,
     })
 
-def staff_login(request):
-    """
-    Custom login view for staff.
-    """
-    if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-        user = authenticate(request, username=username, password=password)
 
-        if user is not None:
-            login(request, user)
-            return redirect('staff_dashboard')  # Redirect after successful login
-        else:
-            messages.error(request, "Invalid username or password.")
-    return render(request, 'rota/login.html')
-
-    
 @user_passes_test(lambda u: u.is_staff)
 def update_rota(request, rota_id):
     """
@@ -118,16 +137,37 @@ def staff_dashboard(request):
     return render(request, 'rota/staff_dashboard.html', {'shifts': shifts})
 
 
+def user_login(request):
+    """
+    Handles login for both staff/admin and regular users.
+    """
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            if user.is_staff:  # Redirect admins/superusers to the admin page
+                if user.is_superuser:
+                    return redirect('admin_create_rota')  # Redirect to rota creation
+                return redirect('admin_dashboard')  # Redirect to admin dashboard
+            else:  # Redirect regular users to their dashboard
+                return redirect('staff_dashboard')
+        else:
+            messages.error(request, "Invalid username or password.")
+
+    return render(request, 'rota/login.html')
+
 @login_required
 def completed_shifts(request):
     """
-    Displays past shifts for the staff.
+    Displays completed shifts for the staff member.
+    Completed shifts are those with a date earlier than today.
     """
-    today = timezone.now().date()
+    today = now().date()
+    # Filter shifts where the date is in the past and belongs to the logged-in user
     shifts = Rota.objects.filter(user=request.user, date__lt=today).order_by('-date')
-
-    if not shifts.exists():
-        messages.info(request, "No completed shifts available.")
 
     return render(request, 'rota/completed_shifts.html', {'shifts': shifts})
 
