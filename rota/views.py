@@ -5,7 +5,8 @@ from django.contrib import messages
 from django.utils import timezone
 from .models import Rota, Request, User 
 from django.utils.timezone import now
-from .forms import RotaForm, RequestForm
+from .forms import RotaForm, RequestForm, StaffCreationForm, StaffProfileForm
+
 
 
 def admin_login(request):
@@ -28,6 +29,39 @@ def admin_login(request):
         else:
             messages.error(request, "Invalid credentials or you do not have admin access.")
     return render(request, 'rota/admin_login.html')
+
+
+@user_passes_test(lambda u: u.is_staff)
+def create_staff_profile(request):
+    """
+    Allows admin to create a staff profile.
+    """
+    if request.method == "POST":
+        user_form = StaffCreationForm(request.POST)
+        profile_form = StaffProfileForm(request.POST)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            # Save user
+            user = user_form.save(commit=False)
+            user.set_password(user_form.cleaned_data['password'])
+            user.save()
+
+            # Save profile
+            profile = profile_form.save(commit=False)
+            profile.user = user
+            profile.save()
+
+            messages.success(request, f"Profile for {user.username} created successfully!")
+            return redirect('admin_dashboard')  # Adjust this to the appropriate admin page
+    else:
+        user_form = StaffCreationForm()
+        profile_form = StaffProfileForm()
+
+    return render(request, 'rota/create_staff_profile.html', {
+        'user_form': user_form,
+        'profile_form': profile_form,
+    })
+
 
 @user_passes_test(lambda u: u.is_staff)
 def admin_create_rota(request):

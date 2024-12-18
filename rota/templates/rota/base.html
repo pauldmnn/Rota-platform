@@ -28,17 +28,18 @@
                             <a class="nav-link" href="{% url 'completed_shifts' %}">Completed Shifts</a>
                         </li>
                         <li class="nav-item">
+                            <a href="{% url 'admin_dashboard' %}" class="btn btn-warning">Admin Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'staff_profile' %}" class="btn btn-primary">Profile</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="btn btn-danger" href="{% url 'logout' %}">Logout</a>
                         </li>
                     {% else %}
                         <li class="nav-item">
                             <a class="btn btn-primary" href="{% url 'login' %}">Login</a>
                         </li>
-                    {% endif %}
-                    {% if user.is_staff %}
-                        <a href="{% url 'admin_dashboard' %}" class="btn btn-warning">Admin Dashboard</a>
-                    {% else %}
-                        <a href="{% url 'staff_dashboard' %}" class="btn btn-primary">User Dashboard</a>
                     {% endif %}
                 </ul>
             </div>

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Rota, Request
+from .models import Rota, Request, StaffProfile
 
 class RotaForm(forms.ModelForm):
     """
@@ -25,4 +25,27 @@ class RequestForm(forms.ModelForm):
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'comment': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+        }
+
+
+class StaffCreationForm(forms.ModelForm):
+    """
+    Form for the admin to create staff profiles.
+    """
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password']
+
+class StaffProfileForm(forms.ModelForm):
+    """
+    Form for additional staff profile details.
+    """
+    class Meta:
+        model = StaffProfile
+        fields = ['full_name', 'address', 'phone_number']
+        widgets = {
+            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
         }

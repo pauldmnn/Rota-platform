@@ -1,0 +1,20 @@
+{% extends 'rota/base.html' %}
+
+{% block title %}Create Staff Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Create Staff Profile</h2>
+
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        <h4>Account Information</h4>
+        {{ user_form.as_p }}
+
+        <h4>Profile Details</h4>
+        {{ profile_form.as_p }}
+
+        <button type="submit" class="btn btn-primary w-100 mt-3">Create Profile</button>
+    </form>
+</div>
+{% endblock %}
