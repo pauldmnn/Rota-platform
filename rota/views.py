@@ -196,24 +196,21 @@ def staff_dashboard(request):
 
 def user_login(request):
     """
-    Handles login for both staff/admin and regular users.
+    Custom login view to redirect admins to the admin dashboard.
     """
-    if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
             login(request, user)
-            if user.is_staff:  # Redirect admins/superusers to the admin page
-                if user.is_superuser:
-                    return redirect('admin_create_rota')  # Redirect to rota creation
-                return redirect('admin_dashboard')  # Redirect to admin dashboard
-            else:  # Redirect regular users to their dashboard
-                return redirect('staff_dashboard')
+            if user.is_staff:  # Check if the user is an admin
+                return redirect('admin_dashboard')  # Redirect admin to admin dashboard
+            else:
+                return redirect('staff_dashboard')  # Redirect regular users to staff dashboard
         else:
-            messages.error(request, "Invalid username or password.")
-
+            messages.error(request, "Invalid username or password")
     return render(request, 'rota/login.html')
 
 
