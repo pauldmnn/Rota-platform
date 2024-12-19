@@ -14,37 +14,38 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg custom-dark-blue">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'staff_dashboard' %}">Rota Platform</a>
+            <a class="navbar-brand" href="#">Rota Platform</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    {% if user.is_authenticated %}
-                    {% if '/admin/' not in request.path %}
-                        <!-- Show dashboard button only outside the admin section -->
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    {% if request.user.is_authenticated %}
+                        {% if not request.user.is_staff %}
+                            <!-- Regular user: Show Dashboard -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'staff_dashboard' %}">Dashboard</a>
+                            </li>
+                        {% endif %}
+                        {% if request.user.is_staff %}
+                            <!-- Admin: Show Admin Dashboard -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'admin_dashboard' %}">Admin Dashboard</a>
+                            </li>
+                        {% endif %}
                         <li class="nav-item">
-                            <a href="{% url 'staff_dashboard' %}" class="nav-link">Dashboard</a>
+                            <a class="nav-link" href="{% url 'view_staff_profile' %}">Your Profile</a>
                         </li>
                     {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    {% if request.user.is_authenticated %}
                         <li class="nav-item">
-                            <a href="{% url 'admin_dashboard' %}" class="btn btn-warning">Admin Dashboard</a>
-                        </li>
-                    {% if not request.user.is_staff %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'completed_shifts' %}">Completed Shifts</a>
-                        </li>
-                    {% endif %}
-                        <li class="nav-item">
-                            <a href="{% url 'view_staff_profile' %}" class="btn btn-primary">Profile</a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="btn btn-danger" href="{% url 'logout' %}">Logout</a>
+                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="btn btn-primary" href="{% url 'login' %}">Login</a>
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
                         </li>
                     {% endif %}
                 </ul>

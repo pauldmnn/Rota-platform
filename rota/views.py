@@ -7,6 +7,7 @@ from .models import Rota, Request, User
 from django.utils.timezone import now, timedelta
 from .forms import RotaForm, RequestForm, StaffCreationForm, StaffProfileForm
 from .models import StaffProfile
+from django.http import JsonResponse
 
 
 
@@ -130,38 +131,40 @@ def admin_manage_requests(request):
     return redirect('admin_dashboard')
 
 @user_passes_test(lambda u: u.is_staff)
-def weekly_rota(request):
+def weekly_rota_api(request):
     """
-    View to display the weekly rota for all staff.
+    API view to return rota data for the requested week.
     """
-    # Get the current week's starting date (Monday)
     today = now().date()
-    start_of_week = today - timedelta(days=today.weekday())  # Monday of the current week
-    end_of_week = start_of_week + timedelta(days=6)  # Sunday of the current week
+    week_offset = int(request.GET.get('week_offset', 0))
+    start_of_week = today - timedelta(days=today.weekday()) + timedelta(weeks=week_offset)
+    end_of_week = start_of_week + timedelta(days=6)
 
-    # Generate a list of days in the current week
     week_dates = [start_of_week + timedelta(days=i) for i in range(7)]
+    all_staff = User.objects.all()
+    weekly_rotas = Rota.objects.filter(date__range=[start_of_week, end_of_week]).order_by('date')
 
-    # Filter rota entries for the current week
-    weekly_rotas = Rota.objects.filter(date__range=[start_of_week, end_of_week]).order_by('user', 'date')
+    rota_data = []
+    for staff in all_staff:
+        staff_shifts = {str(date): None for date in week_dates}
+        for rota in weekly_rotas.filter(user=staff):
+            staff_shifts[str(rota.date)] = {
+                'shift_type': rota.shift_type,
+                'start_time': rota.start_time.strftime("%H:%M") if rota.start_time else "N/A",
+                'end_time': rota.end_time.strftime("%H:%M") if rota.end_time else "N/A",
+            }
+        rota_data.append({'user': staff.get_full_name(), 'shifts': staff_shifts})
 
-    # Organize rota entries into a list of dictionaries
-    rota_by_staff = []
-    for rota in weekly_rotas:
-        rota_by_staff.append({
-            'user': rota.user,
-            'date': rota.date,
-            'shift_type': rota.shift_type,
-            'start_time': rota.start_time,
-            'end_time': rota.end_time,
-        })
-
-    return render(request, 'rota/weekly_rota.html', {
-        'start_of_week': start_of_week,
-        'end_of_week': end_of_week,
-        'week_dates': week_dates,  # Pass week dates to the template
-        'rota_by_staff': rota_by_staff,
+    return JsonResponse({
+        'week_dates': [str(date) for date in week_dates],
+        'rota_data': rota_data,
+        'start_of_week': start_of_week.strftime("%Y-%m-%d"),
+        'end_of_week': end_of_week.strftime("%Y-%m-%d"),
     })
+
+
+
+   
 @user_passes_test(lambda u: u.is_staff)
 def update_rota(request, rota_id):
     """
