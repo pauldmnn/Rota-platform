@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.utils import timezone
 from .models import Rota, Request, User 
-from django.utils.timezone import now
+from django.utils.timezone import now, timedelta
 from .forms import RotaForm, RequestForm, StaffCreationForm, StaffProfileForm
 from .models import StaffProfile
 
@@ -85,6 +85,7 @@ def admin_create_rota(request):
         form = RotaForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, "Rota created successfully!")
             return redirect('admin_dashboard')  # Redirect to dashboard after rota creation
     else:
         form = RotaForm()
@@ -129,30 +130,38 @@ def admin_manage_requests(request):
     return redirect('admin_dashboard')
 
 @user_passes_test(lambda u: u.is_staff)
-def admin_weekly_rota(request):
+def weekly_rota(request):
     """
-    Displays the rota for the current week in a table format.
+    View to display the weekly rota for all staff.
     """
+    # Get the current week's starting date (Monday)
     today = now().date()
-    start_of_week = today - timezone(days=today.weekday())  # Get Monday of the current week
-    end_of_week = start_of_week + timezone(days=6)         # Get Sunday of the current week
+    start_of_week = today - timedelta(days=today.weekday())  # Monday of the current week
+    end_of_week = start_of_week + timedelta(days=6)  # Sunday of the current week
 
-    rota_data = {}
-    staff = Rota.objects.filter(date__range=[start_of_week, end_of_week]).order_by('user', 'date')
+    # Generate a list of days in the current week
+    week_dates = [start_of_week + timedelta(days=i) for i in range(7)]
 
-    for shift in staff:
-        if shift.user not in rota_data:
-            rota_data[shift.user] = [None] * 7  # Initialize list for 7 days of the week
-        index = (shift.date - start_of_week).days  # Calculate day index
-        rota_data[shift.user][index] = shift
+    # Filter rota entries for the current week
+    weekly_rotas = Rota.objects.filter(date__range=[start_of_week, end_of_week]).order_by('user', 'date')
+
+    # Organize rota entries into a list of dictionaries
+    rota_by_staff = []
+    for rota in weekly_rotas:
+        rota_by_staff.append({
+            'user': rota.user,
+            'date': rota.date,
+            'shift_type': rota.shift_type,
+            'start_time': rota.start_time,
+            'end_time': rota.end_time,
+        })
 
     return render(request, 'rota/weekly_rota.html', {
-        'rota': rota_data,
-        'week_start': start_of_week,
-        'week_end': end_of_week,
+        'start_of_week': start_of_week,
+        'end_of_week': end_of_week,
+        'week_dates': week_dates,  # Pass week dates to the template
+        'rota_by_staff': rota_by_staff,
     })
-
-
 @user_passes_test(lambda u: u.is_staff)
 def update_rota(request, rota_id):
     """

@@ -21,8 +21,14 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
+                    {% if '/admin/' not in request.path %}
+                        <!-- Show dashboard button only outside the admin section -->
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'staff_dashboard' %}">Dashboard</a>
+                            <a href="{% url 'staff_dashboard' %}" class="nav-link">Dashboard</a>
+                        </li>
+                    {% endif %}
+                        <li class="nav-item">
+                            <a href="{% url 'admin_dashboard' %}" class="btn btn-warning">Admin Dashboard</a>
                         </li>
                     {% if not request.user.is_staff %}
                         <li class="nav-item">
@@ -32,9 +38,7 @@
                         <li class="nav-item">
                             <a href="{% url 'view_staff_profile' %}" class="btn btn-primary">Profile</a>
                         </li>
-                        <li class="nav-item">
-                            <a href="{% url 'admin_dashboard' %}" class="btn btn-warning">Admin Dashboard</a>
-                        </li>
+                        
                         <li class="nav-item">
                             <a class="btn btn-danger" href="{% url 'logout' %}">Logout</a>
                         </li>
