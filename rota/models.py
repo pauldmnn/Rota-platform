@@ -67,11 +67,16 @@ class StaffProfile(models.Model):
 
 @receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):
+    """
+    Automatically create a StaffProfile only if one doesn't already exist.
+    """
     if created:
-        StaffProfile.objects.create(user=instance)
+        StaffProfile.objects.get_or_create(user=instance)
 
-# Automatically save the StaffProfile when the User is saved
 @receiver(post_save, sender=User)
 def save_profile(sender, instance, **kwargs):
+    """
+    Automatically save the StaffProfile when the User is saved.
+    """
     if hasattr(instance, 'profile'):
         instance.profile.save()

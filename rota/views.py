@@ -279,10 +279,10 @@ def create_staff_profile(request):
             user.is_staff = user_form.cleaned_data['is_staff']  # Set admin rights
             user.save()
 
-            # Save profile
-            profile = profile_form.save(commit=False)
-            profile.user = user
-            profile.save()
+            # Update profile fields if a profile already exists
+            profile = user.profile  # Access the automatically created profile
+            profile_form = StaffProfileForm(request.POST, instance=profile)
+            profile_form.save()
 
             messages.success(request, f"Profile for {user.username} created successfully!")
             return redirect('list_user_profiles')
