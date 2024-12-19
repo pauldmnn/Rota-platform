@@ -97,39 +97,3 @@ form .form-label {
     margin-top: 40px;
 }
 
-/* General styling for the admin page */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f9fa;
-}
-
-/* Responsive container for content */
-.container {
-    padding: 15px;
-}
-
-/* Admin navbar styling */
-.navbar {
-    background-color: #004386 !important;
-}
-
-.navbar .navbar-brand, .navbar .nav-link {
-    color: white !important;
-}
-
-/* Admin table adjustments */
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.table-responsive {
-    overflow-x: auto;
-}
-
-/* Footer styling */
-.footer {
-    background-color: #004386;
-    color: white;
-    text-align: center;
-}

@@ -11,23 +11,20 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch(`/admin/weekly_rota_api/?week_offset=${weekOffset}`)
             .then((response) => response.json())
             .then((data) => {
-                // Update week display
                 weekDisplay.textContent = `Week Commencing: ${data.start_of_week} to ${data.end_of_week}`;
-
-                // Update rota header
                 rotaHeader.innerHTML = "<th>Staff Name</th>";
+                rotaBody.innerHTML = "";
+
                 data.week_dates.forEach((date) => {
                     const th = document.createElement("th");
                     th.textContent = new Date(date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
                     rotaHeader.appendChild(th);
                 });
 
-                // Update rota body
-                rotaBody.innerHTML = "";
                 data.rota_data.forEach((staff) => {
                     const row = document.createElement("tr");
                     const nameCell = document.createElement("td");
-                    nameCell.textContent = staff.user;
+                    nameCell.textContent = staff.user || "Unnamed";
                     row.appendChild(nameCell);
 
                     data.week_dates.forEach((date) => {
@@ -43,10 +40,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     rotaBody.appendChild(row);
                 });
-            });
+            })
+            .catch((error) => console.error("Error fetching rota data:", error));
     };
 
-    // Event listeners for week navigation
     prevBtn.addEventListener("click", () => {
         weekOffset--;
         fetchRotaData();
@@ -57,6 +54,5 @@ document.addEventListener("DOMContentLoaded", () => {
         fetchRotaData();
     });
 
-    // Initial fetch
     fetchRotaData();
 });

@@ -21,7 +21,7 @@ class Rota(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE) 
     date = models.DateField()  
     shift_type = models.CharField(
-        max_length=20, choices=SHIFT_CHOICES, default="Long Day"
+        max_length=50, choices=SHIFT_CHOICES, default="Long Day"
     )  
     start_time = models.TimeField(blank=True, null=True)  
     end_time = models.TimeField(blank=True, null=True) 

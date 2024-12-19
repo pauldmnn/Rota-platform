@@ -131,37 +131,47 @@ def admin_manage_requests(request):
     return redirect('admin_dashboard')
 
 @user_passes_test(lambda u: u.is_staff)
-def weekly_rota_api(request):
+def weekly_rotas(request):
     """
-    API view to return rota data for the requested week.
+    View to display the current week and the next two weeks of rota.
     """
     today = now().date()
-    week_offset = int(request.GET.get('week_offset', 0))
-    start_of_week = today - timedelta(days=today.weekday()) + timedelta(weeks=week_offset)
-    end_of_week = start_of_week + timedelta(days=6)
 
-    week_dates = [start_of_week + timedelta(days=i) for i in range(7)]
-    all_staff = User.objects.all()
-    weekly_rotas = Rota.objects.filter(date__range=[start_of_week, end_of_week]).order_by('date')
+    # Define week start and end for current and next two weeks
+    weeks = []
+    for week_offset in range(3):
+        start_of_week = today - timedelta(days=today.weekday()) + timedelta(weeks=week_offset)
+        end_of_week = start_of_week + timedelta(days=6)
+        weeks.append((start_of_week, end_of_week))
 
-    rota_data = []
-    for staff in all_staff:
-        staff_shifts = {str(date): None for date in week_dates}
-        for rota in weekly_rotas.filter(user=staff):
-            staff_shifts[str(rota.date)] = {
-                'shift_type': rota.shift_type,
-                'start_time': rota.start_time.strftime("%H:%M") if rota.start_time else "N/A",
-                'end_time': rota.end_time.strftime("%H:%M") if rota.end_time else "N/A",
-            }
-        rota_data.append({'user': staff.get_full_name(), 'shifts': staff_shifts})
+    # Fetch all staff (non-superuser users for staff, adjust if needed)
+    all_staff = User.objects.filter(is_active=True).order_by('first_name')
 
-    return JsonResponse({
-        'week_dates': [str(date) for date in week_dates],
-        'rota_data': rota_data,
-        'start_of_week': start_of_week.strftime("%Y-%m-%d"),
-        'end_of_week': end_of_week.strftime("%Y-%m-%d"),
+    # Fetch rotas for the three weeks
+    rotas_by_week = []
+    for start_of_week, end_of_week in weeks:
+        week_dates = [start_of_week + timedelta(days=i) for i in range(7)]
+        weekly_rotas = Rota.objects.filter(date__range=[start_of_week, end_of_week]).order_by('date')
+
+        rota_by_staff = []
+        for staff in all_staff:
+            staff_data = {'user': staff, 'shifts': {}}
+            for date in week_dates:
+                staff_data['shifts'][date] = None  # Initialize with no shifts
+            for rota in weekly_rotas.filter(user=staff):
+                staff_data['shifts'][rota.date] = rota
+            rota_by_staff.append(staff_data)
+
+        rotas_by_week.append({
+            'week_dates': week_dates,
+            'rota_by_staff': rota_by_staff,
+            'start_of_week': start_of_week,
+            'end_of_week': end_of_week,
+        })
+
+    return render(request, 'rota/weekly_rotas.html', {
+        'rotas_by_week': rotas_by_week,
     })
-
 
 
    
