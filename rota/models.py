@@ -58,12 +58,12 @@ class Request(models.Model):
 class StaffProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     full_name = models.CharField(max_length=255)
-    address = models.TextField()
-    phone_number = models.CharField(max_length=15)
+    address = models.TextField(blank=True, null=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    job_title = models.CharField(max_length=100, blank=True, null=True)  # New field for job title
 
     def __str__(self):
         return self.full_name
-
 
 @receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):

@@ -266,7 +266,7 @@ def request_day_off(request):
 @user_passes_test(lambda u: u.is_staff)
 def create_staff_profile(request):
     """
-    Allows only the admin to create a staff profile.
+    Allows admin to create a staff profile.
     """
     if request.method == "POST":
         user_form = StaffCreationForm(request.POST)
@@ -276,6 +276,7 @@ def create_staff_profile(request):
             # Save user
             user = user_form.save(commit=False)
             user.set_password(user_form.cleaned_data['password'])
+            user.is_staff = user_form.cleaned_data['is_staff']  # Set admin rights
             user.save()
 
             # Save profile
@@ -284,7 +285,7 @@ def create_staff_profile(request):
             profile.save()
 
             messages.success(request, f"Profile for {user.username} created successfully!")
-            return redirect('list_user_profiles')  # Redirect to the list of profiles
+            return redirect('list_user_profiles')
     else:
         user_form = StaffCreationForm()
         profile_form = StaffProfileForm()

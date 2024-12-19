@@ -5,16 +5,14 @@
 {% block content %}
 <div class="container mt-5">
     <h2 class="text-center">Admin Dashboard</h2>
-    <div class="container mt-5">
-        <h2 class="text-center">Admin Dashboard</h2>
     
-        <!-- Add buttons for creating profiles and viewing all users -->
-        <div class="mt-4 text-center">
-            <a href="{% url 'create_staff_profile' %}" class="btn btn-primary mx-2">Create New Profile</a>
-            <a href="{% url 'list_user_profiles' %}" class="btn btn-secondary mx-2">View All Users</a>
-        </div>
+    <!-- Add buttons for creating profiles and viewing all users -->
+    <div class="mt-4 text-center">
+        <a href="{% url 'create_staff_profile' %}" class="btn btn-primary mx-2">Create New Profile</a>
+        <a href="{% url 'list_user_profiles' %}" class="btn btn-secondary mx-2">View All Users</a>
+    </div>
     
-        <hr>
+    <hr>
     <h3 class="mt-4">Pending Staff Requests</h3>
     {% if staff_requests %}
         <table class="table table-bordered table-striped mt-4">

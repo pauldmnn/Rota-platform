@@ -31,13 +31,19 @@ class RequestForm(forms.ModelForm):
 
 class StaffCreationForm(forms.ModelForm):
     """
-    Form for the admin to create staff profiles.
+    Form for the admin to create staff user accounts.
     """
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    is_staff = forms.BooleanField(required=False, label="Grant Admin Access")
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ['username', 'email', 'password', 'is_staff']  # Added is_staff field
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+        }
+
 
 class StaffProfileForm(forms.ModelForm):
     """
@@ -45,9 +51,10 @@ class StaffProfileForm(forms.ModelForm):
     """
     class Meta:
         model = StaffProfile
-        fields = ['full_name', 'address', 'phone_number']
+        fields = ['full_name', 'address', 'phone_number', 'job_title']  # Added job_title
         widgets = {
             'full_name': forms.TextInput(attrs={'class': 'form-control'}),
             'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'job_title': forms.TextInput(attrs={'class': 'form-control'}),
         }
