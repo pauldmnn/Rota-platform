@@ -332,3 +332,16 @@ def edit_user_profile(request, user_id):
     })
 
 
+@user_passes_test(lambda u: u.is_staff)
+def delete_user_profile(request, user_id):
+    """
+    Allows admin to delete a user profile.
+    """
+    user = get_object_or_404(User, id=user_id)
+    if user.is_staff:
+        messages.error(request, "You cannot delete another admin.")
+    else:
+        user.delete()
+        messages.success(request, f"User {user.username} and their profile have been deleted successfully.")
+    return redirect('list_user_profiles')
+
