@@ -6,6 +6,7 @@ from django.utils import timezone
 from .models import Rota, Request, User 
 from django.utils.timezone import now
 from .forms import RotaForm, RequestForm, StaffCreationForm, StaffProfileForm
+from .models import StaffProfile
 
 
 
@@ -66,9 +67,9 @@ def create_staff_profile(request):
 @login_required
 def view_staff_profile(request):
     """
-    Allows staff to view their profile details entered by the admin.
+    Allows staff to view their profile details.
     """
-    profile = request.user.profile  # Access the related StaffProfile instance
+    profile = get_object_or_404(StaffProfile, user=request.user)  # Use get_object_or_404 to handle missing profiles
 
     return render(request, 'rota/view_staff_profile.html', {
         'profile': profile
@@ -260,3 +261,74 @@ def request_day_off(request):
         form = RequestForm()
 
     return render(request, 'rota/request_day_off.html', {'form': form})
+
+
+@user_passes_test(lambda u: u.is_staff)
+def create_staff_profile(request):
+    """
+    Allows only the admin to create a staff profile.
+    """
+    if request.method == "POST":
+        user_form = StaffCreationForm(request.POST)
+        profile_form = StaffProfileForm(request.POST)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            # Save user
+            user = user_form.save(commit=False)
+            user.set_password(user_form.cleaned_data['password'])
+            user.save()
+
+            # Save profile
+            profile = profile_form.save(commit=False)
+            profile.user = user
+            profile.save()
+
+            messages.success(request, f"Profile for {user.username} created successfully!")
+            return redirect('list_user_profiles')  # Redirect to the list of profiles
+    else:
+        user_form = StaffCreationForm()
+        profile_form = StaffProfileForm()
+
+    return render(request, 'rota/create_staff_profile.html', {
+        'user_form': user_form,
+        'profile_form': profile_form,
+    })
+
+
+@user_passes_test(lambda u: u.is_staff)
+def list_user_profiles(request):
+    """
+    View for the admin to list all user profiles.
+    """
+    users = User.objects.all().order_by('username')
+    return render(request, 'rota/list_user_profiles.html', {'users': users})
+
+
+@user_passes_test(lambda u: u.is_staff)
+def edit_user_profile(request, user_id):
+    """
+    View for the admin to edit a user's profile.
+    """
+    user = get_object_or_404(User, id=user_id)
+    profile = user.profile  # Access the related StaffProfile
+
+    if request.method == "POST":
+        user_form = StaffCreationForm(request.POST, instance=user)
+        profile_form = StaffProfileForm(request.POST, instance=profile)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, f"Profile for {user.username} updated successfully!")
+            return redirect('list_user_profiles')
+    else:
+        user_form = StaffCreationForm(instance=user)
+        profile_form = StaffProfileForm(instance=profile)
+
+    return render(request, 'rota/edit_user_profile.html', {
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'username': user.username,
+    })
+
+

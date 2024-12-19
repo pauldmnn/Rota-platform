@@ -1,0 +1,32 @@
+{% extends 'rota/base.html' %}
+
+{% block title %}User Profiles{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">User Profiles</h2>
+
+    <table class="table table-bordered table-striped mt-4">
+        <thead class="table-dark">
+            <tr>
+                <th>Username</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.profile.full_name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <a href="{% url 'edit_user_profile' user.id %}" class="btn btn-primary btn-sm">Edit</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

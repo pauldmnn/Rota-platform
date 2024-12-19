@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import date
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 # Shift Type Choices
 SHIFT_CHOICES = [
@@ -61,3 +63,15 @@ class StaffProfile(models.Model):
 
     def __str__(self):
         return self.full_name
+
+
+@receiver(post_save, sender=User)
+def create_profile(sender, instance, created, **kwargs):
+    if created:
+        StaffProfile.objects.create(user=instance)
+
+# Automatically save the StaffProfile when the User is saved
+@receiver(post_save, sender=User)
+def save_profile(sender, instance, **kwargs):
+    if hasattr(instance, 'profile'):
+        instance.profile.save()
