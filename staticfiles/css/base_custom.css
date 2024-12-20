@@ -61,6 +61,61 @@ main {
     padding: 15px;
 }
 
+/* Show element */
+.show {
+    display: block;
+}
+
+/* Hide element */
+.hide {
+    display: none;
+}
+
+/* Highlight for sickness/absence */
+.sickness-absence {
+    background-color: red;
+    color: white;
+}
+
+/* Styling for the custom time input fields */
+.custom-time-input {
+    display: none; /* Hidden by default */
+    margin-top: 5px;
+}
+
+/* Display the custom time input fields when active */
+.custom-time-input.show {
+    display: block;
+}
+
+/* Styling for sickness/absence shifts */
+.sickness-absence {
+    background-color: red;
+    color: white;
+}
+
+/* General table styling for consistency */
+.table-bordered td, .table-bordered th {
+    vertical-align: middle;
+    text-align: center;
+}
+
+.table-bordered td {
+    position: relative;
+}
+
+/* Placeholder for unassigned shifts */
+.no-shift {
+    color: gray;
+    font-style: italic;
+}
+
+.no-shift {
+    color: gray;
+    font-style: italic;
+}
+
+
 /* Footer Styling */
 .footer {
     background-color: #004386;
