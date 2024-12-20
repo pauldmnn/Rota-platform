@@ -124,13 +124,25 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'your-email@gmail.com'
 EMAIL_HOST_PASSWORD = 'your-email-password'
 
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',  # Updated to AxesStandaloneBackend
+    'django.contrib.auth.backends.ModelBackend',  # Default Django auth backend
+]
 
 # Axes Configuration
-AXES_FAILURE_LIMIT = 5  # Maximum number of login attempts
-AXES_LOCKOUT_TEMPLATE = 'rota/lockout.html'  # Custom lockout page
-AXES_LOCKOUT_URL = '/lockout/'  # URL to redirect after lockout
-AXES_COOLOFF_TIME = timedelta(minutes=30)  # Lockout duration
-AXES_RESET_ON_SUCCESS = True  # Reset attempts counter on successful login
+# Axes Configuration
+AXES_ENABLED = True
+AXES_FAILURE_LIMIT = 5  # Maximum login attempts before lockout
+AXES_COOLOFF_TIME = timedelta(minutes=5)  # Lockout duration
+AXES_RESET_ON_SUCCESS = True  # Reset lockout counter on successful login
+
+# Use AXES_USERNAME_CALLABLE for per-user lockouts
+AXES_USERNAME_CALLABLE = lambda request: request.POST.get('username', None)
+
+# Lockout based only on username
+AXES_LOCKOUT_PARAMETERS = ['username']
+
+
 
 
 CSRF_TRUSTED_ORIGINS = [
