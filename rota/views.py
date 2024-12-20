@@ -209,7 +209,7 @@ def staff_dashboard(request):
 
 def user_login(request):
     """
-    Custom login view to redirect admins to the admin dashboard.
+    Custom login view to handle user authentication.
     """
     if request.method == 'POST':
         username = request.POST['username']
@@ -218,12 +218,18 @@ def user_login(request):
 
         if user is not None:
             login(request, user)
-            if user.is_staff:  # Check if the user is an admin
-                return redirect('admin_dashboard')  # Redirect admin to admin dashboard
-            else:
-                return redirect('staff_dashboard')  # Redirect regular users to staff dashboard
+            if user.is_staff:  # Redirect admin to admin dashboard
+                return redirect('admin_dashboard')
+            else:  # Redirect regular users to staff dashboard
+                return redirect('staff_dashboard')
         else:
-            messages.error(request, "Invalid username or password")
+            # Check if the username exists to distinguish between wrong username and wrong password
+            from django.contrib.auth.models import User
+            if User.objects.filter(username=username).exists():
+                messages.error(request, "Wrong password. Please try again.")
+            else:
+                messages.error(request, "Username not found. Please try again.")
+
     return render(request, 'rota/login.html')
 
 
