@@ -11,6 +11,7 @@ SHIFT_CHOICES = [
     ("Late", "Late"),
     ("Night", "Night"),
     ("Custom", "Custom"),
+    ("Sickness/Absence", "Sickness/Absence"),
 ]
 
 
@@ -23,6 +24,7 @@ class Rota(models.Model):
     shift_type = models.CharField(
         max_length=50, choices=SHIFT_CHOICES, default="Long Day"
     )  
+    sickness_or_absence_type = models.CharField(max_length=255, blank=True, null=True)  # New field
     start_time = models.TimeField(blank=True, null=True)  
     end_time = models.TimeField(blank=True, null=True) 
     is_updated = models.BooleanField(default=False)
@@ -33,8 +35,8 @@ class Rota(models.Model):
 
     def __str__(self):
         if self.shift_type == "Custom" and self.start_time and self.end_time:
-            return f"{self.user.username} - {self.date} - Custom ({self.start_time} to {self.end_time})"
-        return f"{self.user.username} - {self.date} - {self.shift_type}"
+            return f"{self.user} - {self.date} - Custom ({self.start_time} to {self.end_time})"
+        return f"{self.user} - {self.date} - {self.shift_type}"
 
 # Staff making request to be off or work certain days
 class Request(models.Model):
@@ -52,7 +54,7 @@ class Request(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.date} ({self.status})"
+        return f"{self.user.user} - {self.date} ({self.status})"
 
 
 class StaffProfile(models.Model):

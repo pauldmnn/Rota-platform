@@ -11,6 +11,7 @@ from django.http import JsonResponse
 
 
 
+
 def admin_login(request):
     """
     Custom login view for the site admin page.
@@ -87,7 +88,7 @@ def admin_create_rota(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Rota created successfully!")
-            return redirect('admin_dashboard')  # Redirect to dashboard after rota creation
+            return redirect('admin_create_rota') 
     else:
         form = RotaForm()
 
@@ -132,9 +133,6 @@ def admin_manage_requests(request):
 
 @user_passes_test(lambda u: u.is_staff)
 def weekly_rotas(request):
-    """
-    View to display the current week and the next two weeks of rota.
-    """
     today = now().date()
 
     # Define week start and end for current and next two weeks
@@ -163,7 +161,7 @@ def weekly_rotas(request):
             rota_by_staff.append(staff_data)
 
         rotas_by_week.append({
-            'week_dates': week_dates,
+            'week_dates': week_dates,  # Ensure exactly 7 days
             'rota_by_staff': rota_by_staff,
             'start_of_week': start_of_week,
             'end_of_week': end_of_week,
@@ -171,8 +169,39 @@ def weekly_rotas(request):
 
     return render(request, 'rota/weekly_rotas.html', {
         'rotas_by_week': rotas_by_week,
+        'highlight_shift_types': ["Sickness/Absence"],  # Pass this list to the template
     })
 
+
+@user_passes_test(lambda u: u.is_staff)
+def update_rota_inline(request):
+    if request.method == "POST":
+        import json
+        data = json.loads(request.body)
+
+        user_id = data.get("user_id")
+        date = data.get("date")
+        shift_type = data.get("shift_type")
+        sickness_or_absence_type = data.get("sickness_or_absence_type", "")
+
+        try:
+            user = get_object_or_404(User, id=user_id)
+            rota, created = Rota.objects.get_or_create(user=user, date=date)
+
+            if shift_type == "":
+                rota.delete()
+                return JsonResponse({'status': 'success', 'message': 'Shift removed.'})
+
+            rota.shift_type = shift_type
+            rota.sickness_or_absence_type = sickness_or_absence_type if shift_type == "Sickness/Absence" else ""
+            rota.is_updated = True if shift_type == "Sickness/Absence" else False
+            rota.save()
+
+            return JsonResponse({'status': 'success', 'message': 'Shift updated.'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request.'})
 
    
 @user_passes_test(lambda u: u.is_staff)
