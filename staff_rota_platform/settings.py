@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from datetime import timedelta
 import dj_database_url
 if os.path.isfile('env.py'):
     import env
@@ -40,12 +41,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'axes',
     'rota'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'axes.middleware.AxesMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -120,6 +123,14 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'your-email@gmail.com'
 EMAIL_HOST_PASSWORD = 'your-email-password'
+
+
+# Axes Configuration
+AXES_FAILURE_LIMIT = 5  # Maximum number of login attempts
+AXES_LOCKOUT_TEMPLATE = 'rota/lockout.html'  # Custom lockout page
+AXES_LOCKOUT_URL = '/lockout/'  # URL to redirect after lockout
+AXES_COOLOFF_TIME = timedelta(minutes=30)  # Lockout duration
+AXES_RESET_ON_SUCCESS = True  # Reset attempts counter on successful login
 
 
 CSRF_TRUSTED_ORIGINS = [
