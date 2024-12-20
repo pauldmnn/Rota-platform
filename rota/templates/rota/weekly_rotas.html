@@ -57,59 +57,8 @@
     {% endfor %}
 </div>
 
-<script>
-    // Add event listeners to handle showing/hiding the sickness/absence input
-    document.querySelectorAll('.shift-select').forEach(select => {
-        select.addEventListener('change', function () {
-            const cell = this.closest('td');
-            const sicknessInput = cell.querySelector('.sickness-type');
-            if (this.value === 'Sickness/Absence') {
-                sicknessInput.style.display = 'block';
-                cell.style.backgroundColor = 'red';
-                cell.style.color = 'white';
-            } else {
-                sicknessInput.style.display = 'none';
-                cell.style.backgroundColor = '';
-                cell.style.color = '';
-            }
+{% endblock %}
 
-            updateRota(cell);
-        });
-    });
-
-    document.querySelectorAll('.sickness-type').forEach(input => {
-        input.addEventListener('change', function () {
-            const cell = this.closest('td');
-            updateRota(cell);
-        });
-    });
-
-    function updateRota(cell) {
-        const userId = cell.getAttribute('data-user-id');
-        const date = cell.getAttribute('data-date');
-        const shiftType = cell.querySelector('.shift-select').value;
-        const sicknessType = cell.querySelector('.sickness-type') ? cell.querySelector('.sickness-type').value : '';
-
-        fetch("{% url 'update_rota_inline' %}", {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                user_id: userId,
-                date: date,
-                shift_type: shiftType,
-                sickness_or_absence_type: sicknessType,
-            }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status !== 'success') {
-                alert(data.message || 'Failed to update shift');
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
-</script>
+{% block extra_js %}
+<script src="{% static 'js/weekly_rotas.js' %}"></script>
 {% endblock %}
