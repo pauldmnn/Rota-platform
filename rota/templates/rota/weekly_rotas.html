@@ -38,13 +38,14 @@
                                         <input type="time" class="start-time form-control mb-1" value="{{ shift.start_time|default:'' }}">
                                         <input type="time" class="end-time form-control" value="{{ shift.end_time|default:'' }}">
                                     </div>
-                                    <input
-                                    type="text"
+                                    <input type="text"
                                     class="sickness-type form-control mt-1 {% if shift and shift.shift_type == 'Sickness/Absence' %}show sickness-absence{% else %}hide{% endif %}"
                                     placeholder="Type of Sickness/Absence"
                                     value="{% if shift and shift.shift_type == 'Sickness/Absence' %}{{ shift.sickness_or_absence_type }}{% endif %}">
                                     {% if shift and shift.shift_type %}
-                                        <small>{{ shift.start_time|default:"" }} - {{ shift.end_time|default:"" }}</small>
+                                    <small>
+                                        {{ shift.start_time|default:"" }}{% if shift.start_time and shift.end_time %} - {% endif %}{{ shift.end_time|default:"" }}
+                                    </small>
                                     {% endif %}
                                 {% endwith %}
                             </td>

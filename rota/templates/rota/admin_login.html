@@ -4,13 +4,6 @@
 {% block content %}
 <div class="container mt-5">
     <h2 class="text-center">Admin Login</h2>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
     <form method="post">
         {% csrf_token %}
         <div class="mb-3">
