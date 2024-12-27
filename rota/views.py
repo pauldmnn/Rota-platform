@@ -411,3 +411,11 @@ def delete_user_profile(request, user_id):
         messages.success(request, f"User {user.username} and their profile have been deleted successfully.")
     return redirect('list_user_profiles')
 
+
+def password_reset_request(request):
+    """
+    Displays a message instructing users to contact their manager for password assistance.
+    """
+    message = "Please see your line manager to reset your password."
+    return render(request, "rota/password_reset_request.html", {"message": message})
+

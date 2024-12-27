@@ -23,14 +23,7 @@ urlpatterns = [
     path('admin/delete_profile/<int:user_id>/', views.delete_user_profile, name='delete_user_profile'),
     path('profile/', views.staff_profile, name='staff_profile'),
     path('dashboard/', views.staff_dashboard, name='staff_dashboard'),
-    path('change_password/', auth_views.PasswordChangeView.as_view(
-        template_name='rota/change_password.html',
-        success_url='/dashboard/'  # Redirect after successful password change
-    ), name='change_password'),
-    path('password_reset/', auth_views.PasswordResetView.as_view(template_name='rota/password_reset.html'), name='password_reset'),
-    path('password_reset_done/', auth_views.PasswordResetDoneView.as_view(template_name='rota/password_reset_done.html'), name='password_reset_done'),
-    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='rota/password_reset_confirm.html'), name='password_reset_confirm'),
-    path('reset_done/', auth_views.PasswordResetCompleteView.as_view(template_name='rota/password_reset_complete.html'), name='password_reset_complete'),
+    path("password-reset/", views.password_reset_request, name="password_reset_request"),
     path('lockout/', TemplateView.as_view(template_name='rota/lockout.html'), name='lockout'),
 
 ]
