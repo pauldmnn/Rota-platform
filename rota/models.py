@@ -37,8 +37,9 @@ class Rota(models.Model):
 
     def __str__(self):
         if self.shift_type == "Custom" and self.start_time and self.end_time:
-            return f"{self.user} - {self.date} - Custom ({self.start_time} to {self.end_time})"
-        return f"{self.user} - {self.date} - {self.shift_type}"
+            return f"{self.user.get_full_name()} - {self.date} - Custom ({self.start_time} to {self.end_time})"
+        return f"{self.user.get_full_name()} - {self.date} - {self.shift_type}"
+
 
 # Staff making request to be off or work certain days
 class Request(models.Model):

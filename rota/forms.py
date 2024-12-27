@@ -15,6 +15,11 @@ class RotaForm(forms.ModelForm):
             'end_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
             'shift_type': forms.Select(attrs={'class': 'form-control'}),
         }
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            # Customize the user dropdown
+            self.fields['user'].queryset = User.objects.all()
+            self.fields['user'].label_from_instance = lambda obj: f"{obj.get_full_name()} ({obj.username})"
 
 class RequestForm(forms.ModelForm):
     """
