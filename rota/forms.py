@@ -8,7 +8,7 @@ class RotaForm(forms.ModelForm):
     """
     class Meta:
         model = Rota
-        fields = ['user', 'date', 'shift_type', 'start_time', 'end_time']  # Include all necessary fields
+        fields = ['user', 'date', 'shift_type', 'start_time', 'end_time']  
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'start_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
@@ -38,11 +38,15 @@ class StaffCreationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password', 'is_staff']  # Added is_staff field
+        fields = ['username', 'email', 'password', 'is_staff']  
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
         }
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fields['email'].required = True
 
 
 class StaffProfileForm(forms.ModelForm):
@@ -51,7 +55,7 @@ class StaffProfileForm(forms.ModelForm):
     """
     class Meta:
         model = StaffProfile
-        fields = ['full_name', 'address', 'phone_number', 'job_title']  # Added job_title
+        fields = ['full_name', 'address', 'email', 'phone_number', 'job_title'] 
         widgets = {
             'full_name': forms.TextInput(attrs={'class': 'form-control'}),
             'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),

@@ -81,14 +81,26 @@ def view_staff_profile(request):
 @user_passes_test(lambda u: u.is_staff)
 def admin_create_rota(request):
     """
-    Allows admin/superuser to create a new rota.
+    Allows admin to create a rota and send email notifications via EmailJS.
     """
     if request.method == "POST":
         form = RotaForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Rota created successfully!")
-            return redirect('admin_create_rota') 
+            rota = form.save()
+
+            print(f"User email: {rota.user.email}")
+
+            # Prepare EmailJS data
+            email_data = {
+                'to_name': rota.user.get_full_name() or rota.user.username,
+                'to_email': rota.user.email, 
+                'date': rota.date.strftime('%Y-%m-%d'),
+                'shift_type': rota.shift_type,
+            }
+
+            # Use JavaScript to send email
+            messages.success(request, "Rota created successfully. Email notification will be sent.")
+            return render(request, 'rota/email_notification.html', {'email_data': email_data})
     else:
         form = RotaForm()
 

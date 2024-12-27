@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['8000-pauldmnn-rotaplatform-bswsshkpux0.ws.codeinstitute-ide.net',
                 '.herokuapp.com']
@@ -120,22 +120,11 @@ LOGOUT_REDIRECT_URL = '/login/'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 
-# Email Configuration
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = 'Rota Platform <rotaplatform.test@gmail.com>'
-
-
 AUTHENTICATION_BACKENDS = [
     'axes.backends.AxesStandaloneBackend',  # Updated to AxesStandaloneBackend
     'django.contrib.auth.backends.ModelBackend',  # Default Django auth backend
 ]
 
-# Axes Configuration
 # Axes Configuration
 AXES_ENABLED = True
 AXES_FAILURE_LIMIT = 5  # Maximum login attempts before lockout

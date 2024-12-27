@@ -63,11 +63,12 @@ class StaffProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     full_name = models.CharField(max_length=255)
     address = models.TextField(blank=True, null=True)
+    email = models.EmailField(max_length=255, blank=False, unique=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
-    job_title = models.CharField(max_length=100, blank=True, null=True)  # New field for job title
+    job_title = models.CharField(max_length=100, blank=True, null=True) 
 
     def __str__(self):
-        return self.full_name
+        return self.user.username
 
 @receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):
@@ -86,25 +87,3 @@ def save_profile(sender, instance, **kwargs):
         instance.profile.save()
 
 
-@receiver(post_save, sender=Rota)
-def send_rota_notification(sender, instance, created, **kwargs):
-    """
-    Sends an email notification to the user when a rota is created.
-    """
-    if created:
-        user = instance.user
-        subject = "Your New Rota Assignment"
-        message = (
-            f"Hello {user.get_full_name()},\n\n"
-            f"You have been assigned a new shift:\n"
-            f"Date: {instance.date}\n"
-            f"Shift Type: {instance.shift_type}\n\n"
-            "Please log in to the platform for more details.\n"
-        )
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [user.email],
-            fail_silently=False,
-        )

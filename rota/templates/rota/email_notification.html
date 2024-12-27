@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Notification</title>
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+    </script>
+    <script type="text/javascript">
+        (function(){
+            emailjs.init({
+                publicKey: "FImxwS6wu5uIRoH4C",
+            });
+        })();
+    </script>
+</head>
+<body>
+    <h3>Email Notification</h3>
+    <p>Sending email notification...</p>
+    <script>
+        emailjs.send("service_tkdajc5", "template_i8136tb", {
+            to_name: "{{ rota_data.to_name }}",
+            to_email: "{{ rota_data.to_email }}",
+            date: "{{ rota_data.date }}",
+            shift_type: "{{ rota_data.shift_type }}"
+        }).then(
+            function (response) {
+                alert('Email sent successfully!');
+                window.location.href = "{% url 'admin_create_rota' %}";
+            },
+            function (error) {
+                alert('Failed to send email: ' + error.text);
+                window.location.href = "{% url 'admin_dashboard' %}";
+            }
+        );
+    </script>
+</body>
+</html>
