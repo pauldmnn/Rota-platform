@@ -94,6 +94,17 @@ def admin_create_rota(request):
 
     return render(request, 'rota/admin_create_rota.html', {'form': form})
 
+
+@user_passes_test(lambda u: u.is_staff)
+def admin_allocated_shifts(request):
+    """
+    Displays shifts allocated to the logged-in admin.
+    """
+    today = timezone.now().date()
+    shifts = Rota.objects.filter(user=request.user, date__gte=today).order_by('date')
+
+    return render(request, 'rota/admin_allocated_shifts.html', {'shifts': shifts})
+
 @user_passes_test(lambda u: u.is_staff)
 def admin_dashboard(request):
     """

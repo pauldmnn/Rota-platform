@@ -1,0 +1,33 @@
+{% extends 'rota/base.html' %}
+
+{% block title %}Allocated Shifts{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Allocated Shifts</h2>
+    {% if shifts %}
+        <table class="table table-bordered table-striped mt-4">
+            <thead class="table-dark">
+                <tr>
+                    <th>Date</th>
+                    <th>Shift Type</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for shift in shifts %}
+                    <tr>
+                        <td>{{ shift.date }}</td>
+                        <td>{{ shift.shift_type }}</td>
+                        <td>{{ shift.start_time|default:"-" }}</td>
+                        <td>{{ shift.end_time|default:"-" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-center">No shifts have been allocated to you.</p>
+    {% endif %}
+</div>
+{% endblock %}

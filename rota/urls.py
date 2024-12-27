@@ -6,6 +6,7 @@ from django.views.generic import TemplateView
 urlpatterns = [
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('admin/create_staff_profile/', views.create_staff_profile, name='create_staff_profile'),
+    path('admin/allocated_shifts/', views.admin_allocated_shifts, name='admin_allocated_shifts'),
     path('view_profile/', views.view_staff_profile, name='view_staff_profile'),
     path('', views.staff_dashboard, name='staff_dashboard'),
     path('completed_shifts/', views.completed_shifts, name='completed_shifts'),
