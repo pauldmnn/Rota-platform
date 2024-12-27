@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['8000-pauldmnn-rotaplatform-bswsshkpux0.ws.codeinstitute-ide.net',
                 '.herokuapp.com']
@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'axes',
     'rota'
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -138,7 +139,7 @@ AXES_COOLOFF_TIME = timedelta(minutes=5)  # Lockout duration
 AXES_RESET_ON_SUCCESS = True  # Reset lockout counter on successful login
 
 # Use AXES_USERNAME_CALLABLE for per-user lockouts
-AXES_USERNAME_CALLABLE = lambda request: request.POST.get('username', None)
+AXES_USERNAME_CALLABLE = lambda request, credentials: credentials.get('username', None)
 
 # Lockout based only on username
 AXES_LOCKOUT_PARAMETERS = ['username']
