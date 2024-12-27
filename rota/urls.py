@@ -8,12 +8,12 @@ urlpatterns = [
     path('admin/create_staff_profile/', views.create_staff_profile, name='create_staff_profile'),
     path('admin/allocated_shifts/', views.admin_allocated_shifts, name='admin_allocated_shifts'),
     path('view_profile/', views.view_staff_profile, name='view_staff_profile'),
-    path('', views.staff_dashboard, name='staff_dashboard'),
+    path('home/', views.home_page, name='home'),
     path('completed_shifts/', views.completed_shifts, name='completed_shifts'),
     path('request_day_off/', views.request_day_off, name='request_day_off'),
     path('admin/manage_requests/', views.admin_manage_requests, name='admin_manage_requests'),  # Manage requests
     path('login/', views.user_login, name='login'),  # Login page
-    path('logout/', views.custom_logout, name='logout'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
     path('admin/create_rota/', views.admin_create_rota, name='admin_create_rota'),  # Admin rota creation
     path('admin/update_rota/<int:rota_id>/', views.update_rota, name='update_rota'),  # Update rota
     path('admin/weekly_rotas/', views.weekly_rotas, name='weekly_rotas'),

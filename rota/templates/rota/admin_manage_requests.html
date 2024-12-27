@@ -9,7 +9,7 @@
 <form method="post">
     {% csrf_token %}
     {% for request in pending_requests %}
-    <div class="border p-3 mb-3">
+    <div class="border p-3 mb-3 text-white">
         <p><strong>{{ request.user.username }}</strong> requested <strong>{{ request.requested_day }}</strong></p>
         <p>Comment: {{ request.comment|default:"-" }}</p>
         <div class="mb-2">

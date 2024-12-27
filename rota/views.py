@@ -10,7 +10,11 @@ from .models import StaffProfile
 from django.http import JsonResponse
 
 
-
+def home_page(request):
+    """
+    Render the home page with a description of the site.
+    """
+    return render(request, 'rota/home.html')
 
 def admin_login(request):
     """
@@ -87,20 +91,6 @@ def admin_create_rota(request):
         form = RotaForm(request.POST)
         if form.is_valid():
             rota = form.save()
-
-            print(f"User email: {rota.user.email}")
-
-            # Prepare EmailJS data
-            email_data = {
-                'to_name': rota.user.get_full_name() or rota.user.username,
-                'to_email': rota.user.email, 
-                'date': rota.date.strftime('%Y-%m-%d'),
-                'shift_type': rota.shift_type,
-            }
-
-            # Use JavaScript to send email
-            messages.success(request, "Rota created successfully. Email notification will be sent.")
-            return render(request, 'rota/email_notification.html', {'email_data': email_data})
     else:
         form = RotaForm()
 
@@ -301,7 +291,7 @@ def custom_logout(request):
     Logs out the user and redirects to the login page.
     """
     logout(request)
-    return redirect('login')
+    return redirect('home')
 
 
 @login_required

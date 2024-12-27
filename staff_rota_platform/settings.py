@@ -113,9 +113,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LOGIN_URL = '/login/' 
-LOGIN_REDIRECT_URL = '/rota_creation/' 
-LOGOUT_REDIRECT_URL = '/login/'
+LOGIN_URL = '' 
+LOGIN_REDIRECT_URL = '/dashboard/' 
+LOGOUT_REDIRECT_URL = '/home/'
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 

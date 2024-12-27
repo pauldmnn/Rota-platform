@@ -11,7 +11,7 @@
     {% for week_data in rotas_by_week %}
         <h3 class="mt-4">Week Commencing: {{ week_data.start_of_week|date:"l, M d" }} - {{ week_data.end_of_week|date:"l, M d" }}</h3>
         <table class="table table-bordered table-striped">
-            <thead class="custom-dark-blue">
+            <thead class="custom-dark-blue text-white">
                 <tr>
                     <th>Staff Name</th>
                     {% for day in week_data.week_dates %}
