@@ -44,10 +44,6 @@ class StaffCreationForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
         }
 
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            self.fields['email'].required = True
-
 
 class StaffProfileForm(forms.ModelForm):
     """
@@ -59,6 +55,7 @@ class StaffProfileForm(forms.ModelForm):
         widgets = {
             'full_name': forms.TextInput(attrs={'class': 'form-control'}),
             'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'email': forms.TextInput(attrs={'class': 'form-control'}),
             'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
             'job_title': forms.TextInput(attrs={'class': 'form-control'}),
         }

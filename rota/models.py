@@ -63,7 +63,7 @@ class StaffProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     full_name = models.CharField(max_length=255)
     address = models.TextField(blank=True, null=True)
-    email = models.EmailField(max_length=255, blank=False, unique=True)
+    email = models.EmailField(max_length=255, blank=True, null=True, unique=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     job_title = models.CharField(max_length=100, blank=True, null=True) 
 
