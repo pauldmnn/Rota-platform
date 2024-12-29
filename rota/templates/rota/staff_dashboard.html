@@ -36,7 +36,9 @@
             </tbody>
         </table>
         <div class="mb-4">
-            <a href="{% url 'request_day_off' %}" class="btn btn-primary">Request Day Off</a>
+            <a href="{% url 'request_day_off' %}" class="btn btn-primary mt-3">Request Day Off</a>
+            <a href="{% url 'completed_shifts' %}" class="btn btn-primary mt-3">View Completed Shifts</a>
+
         </div>
     {% else %}
         <p>No shifts available.</p>

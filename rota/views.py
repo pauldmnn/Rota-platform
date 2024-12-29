@@ -78,7 +78,7 @@ def view_staff_profile(request):
     """
     Allows staff to view their profile details.
     """
-    profile = get_object_or_404(StaffProfile, user=request.user)  # Use get_object_or_404 to handle missing profiles
+    profile = get_object_or_404(StaffProfile, user=request.user)  
 
     return render(request, 'rota/view_staff_profile.html', {
         'profile': profile
@@ -97,7 +97,7 @@ def admin_create_rota(request):
                 form.save()
                 messages.success(request, "Rota created successfully.")
             except forms.ValidationError as e:
-                messages.info(request, e.message)  # Display update message
+                messages.info(request, e.message) 
             return redirect('admin_create_rota')
         else:
             messages.error(request, "Error creating rota. Please fix the issues below.")
@@ -122,7 +122,6 @@ def admin_dashboard(request):
     """
     Admin dashboard displaying all pending staff requests.
     """
-    # Fetch all pending requests
     staff_requests = Request.objects.filter(status='Pending').order_by('-created_at')
 
     return render(request, 'rota/admin_dashboard.html', {
@@ -151,7 +150,6 @@ def admin_manage_requests(request):
 
         staff_request.save()
 
-        # Store the message in the session for the specific user
         if staff_request.user.is_authenticated:
             request.session[f'request_message_{staff_request.user.id}'] = message
 
@@ -167,7 +165,6 @@ def weekly_rotas(request):
     today = now().date()
     start_of_current_week = today - timedelta(days=today.weekday())
 
-    # Defines the weeks to display (current + next two weeks)
     weeks = []
     for i in range(3):  # Current week + next two weeks
         start_of_week = start_of_current_week + timedelta(weeks=i)
@@ -178,11 +175,11 @@ def weekly_rotas(request):
             'week_dates': [start_of_week + timedelta(days=j) for j in range(7)],
         })
 
-    # Query all staff and rota data
+    # Querys all staff and rota data
     all_users = User.objects.all() 
     weekly_rotas = Rota.objects.filter(date__range=[weeks[0]['start_of_week'], weeks[-1]['end_of_week']])
 
-    # Organize rota data by user and week
+    # Organizes rota data by user and week
     rota_data = []
     for user in all_users:
         user_shifts = {}
@@ -194,55 +191,6 @@ def weekly_rotas(request):
         'rota_data': rota_data,
         'weeks': weeks,
     })
-
-
-@user_passes_test(lambda u: u.is_staff)
-def update_rota_inline(request):
-    if request.method == "POST":
-        import json
-        data = json.loads(request.body)
-
-        user_id = data.get("user_id")
-        date = data.get("date")
-        shift_type = data.get("shift_type")
-        sickness_or_absence_type = data.get("sickness_or_absence_type", "")
-
-        try:
-            user = get_object_or_404(User, id=user_id)
-            rota, created = Rota.objects.get_or_create(user=user, date=date)
-
-            if shift_type == "":
-                rota.delete()
-                return JsonResponse({'status': 'success', 'message': 'Shift removed.'})
-
-            rota.shift_type = shift_type
-            rota.sickness_or_absence_type = sickness_or_absence_type if shift_type == "Sickness/Absence" else ""
-            rota.is_updated = True if shift_type == "Sickness/Absence" else False
-            rota.save()
-
-            return JsonResponse({'status': 'success', 'message': 'Shift updated.'})
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)})
-
-    return JsonResponse({'status': 'error', 'message': 'Invalid request.'})
-
-   
-@user_passes_test(lambda u: u.is_staff)
-def update_rota(request, rota_id):
-    """
-    Allows the admin to update a rota entry.
-    """
-    rota_entry = get_object_or_404(Rota, id=rota_id)
-    if request.method == "POST":
-        rota_entry.shift_type = request.POST.get("shift_type", rota_entry.shift_type)
-        rota_entry.start_time = request.POST.get("start_time", rota_entry.start_time)
-        rota_entry.end_time = request.POST.get("end_time", rota_entry.end_time)
-        rota_entry.is_updated = True
-        rota_entry.save()
-        messages.success(request, "Rota updated successfully.")
-        return redirect('admin_weekly_rota')
-
-    return render(request, 'rota/update_rotas.html', {'rota': rota_entry})
 
 
 @login_required
@@ -298,6 +246,55 @@ def custom_logout(request):
     """
     logout(request)
     return redirect('home')
+
+@user_passes_test(lambda u: u.is_staff)
+def update_rota_inline(request):
+    if request.method == "POST":
+        import json
+        data = json.loads(request.body)
+
+        user_id = data.get("user_id")
+        date = data.get("date")
+        shift_type = data.get("shift_type")
+        sickness_or_absence_type = data.get("sickness_or_absence_type", "")
+
+        try:
+            user = get_object_or_404(User, id=user_id)
+            rota, created = Rota.objects.get_or_create(user=user, date=date)
+
+            if shift_type == "":
+                rota.delete()
+                return JsonResponse({'status': 'success', 'message': 'Shift removed.'})
+
+            rota.shift_type = shift_type
+            rota.sickness_or_absence_type = sickness_or_absence_type if shift_type == "Sickness/Absence" else ""
+            rota.is_updated = True if shift_type == "Sickness/Absence" else False
+            rota.save()
+
+            return JsonResponse({'status': 'success', 'message': 'Shift updated.'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request.'})
+
+   
+@user_passes_test(lambda u: u.is_staff)
+def update_rota(request, rota_id):
+    """
+    Allows the admin to update a rota entry.
+    """
+    rota_entry = get_object_or_404(Rota, id=rota_id)
+    if request.method == "POST":
+        rota_entry.shift_type = request.POST.get("shift_type", rota_entry.shift_type)
+        rota_entry.start_time = request.POST.get("start_time", rota_entry.start_time)
+        rota_entry.end_time = request.POST.get("end_time", rota_entry.end_time)
+        rota_entry.is_updated = True
+        rota_entry.save()
+        messages.success(request, "Rota updated successfully.")
+        return redirect('admin_weekly_rota')
+
+    return render(request, 'rota/update_rotas.html', {'rota': rota_entry})
+
 
 
 @login_required

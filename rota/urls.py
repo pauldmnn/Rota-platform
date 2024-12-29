@@ -25,6 +25,7 @@ urlpatterns = [
     path('dashboard/', views.staff_dashboard, name='staff_dashboard'),
     path("password-reset/", views.password_reset_request, name="password_reset_request"),
     path('lockout/', TemplateView.as_view(template_name='rota/lockout.html'), name='lockout'),
+    path('admin/update_rota/<int:rota_id>/', views.update_rota, name='update_rota'),
     path('change_password/', auth_views.PasswordChangeView.as_view(
         template_name='rota/change_password.html',
         success_url='/view_staff_profile/'  # Redirect to the user's profile after password change

@@ -112,12 +112,12 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 LOGIN_URL = '' 
 LOGIN_REDIRECT_URL = '/dashboard/' 
 LOGOUT_REDIRECT_URL = '/home/'
 
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 
 
 AUTHENTICATION_BACKENDS = [
