@@ -150,12 +150,12 @@ def admin_manage_requests(request):
 
         staff_request.save()
 
-        # Save message to the user's session
-        user_session = SessionStore(session_key=staff_request.user.session.session_key)
-        user_session['request_message'] = message
-        user_session.save()
+        # Store the message in the session for the specific user
+        if staff_request.user.is_authenticated:
+            request.session[f'request_message_{staff_request.user.id}'] = message
 
         messages.success(request, f"Request processed for {staff_request.user.username}.")
+
     return redirect('admin_dashboard')
 
 @user_passes_test(lambda u: u.is_staff)
@@ -252,8 +252,12 @@ def staff_dashboard(request):
     today = timezone.now().date()
     shifts = Rota.objects.filter(user=request.user, date__gte=today).order_by('date')
 
-    # Retrieve the session message, if any
-    request_message = request.session.pop('request_message', None)
+    # Retrieve the session message for the current user
+    staff_session = request.session.get(f'session_{request.user.id}', {})
+    request_message = staff_session.pop('request_message', None)
+
+    # Save the updated session (without the message)
+    request.session[f'session_{request.user.id}'] = staff_session
 
     return render(request, 'rota/staff_dashboard.html', {
         'shifts': shifts,

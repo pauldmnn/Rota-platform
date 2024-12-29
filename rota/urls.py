@@ -21,13 +21,13 @@ urlpatterns = [
     path('admin/list_profiles/', views.list_user_profiles, name='list_user_profiles'),
     path('admin/edit_profile/<int:user_id>/', views.edit_user_profile, name='edit_user_profile'),
     path('admin/delete_profile/<int:user_id>/', views.delete_user_profile, name='delete_user_profile'),
-    path('profile/', views.staff_profile, name='staff_profile'),
+    path('view_staff_profile/', views.view_staff_profile, name='view_staff_profile'),
     path('dashboard/', views.staff_dashboard, name='staff_dashboard'),
     path("password-reset/", views.password_reset_request, name="password_reset_request"),
     path('lockout/', TemplateView.as_view(template_name='rota/lockout.html'), name='lockout'),
     path('change_password/', auth_views.PasswordChangeView.as_view(
         template_name='rota/change_password.html',
-        success_url='/profile/'  # Redirect to the user's profile after password change
+        success_url='/view_staff_profile/'  # Redirect to the user's profile after password change
     ), name='change_password'),
 
 ]

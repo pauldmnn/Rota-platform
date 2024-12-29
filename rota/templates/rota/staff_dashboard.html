@@ -1,5 +1,5 @@
 {% extends 'rota/base.html' %}
-{{% load static %}}
+{% load static %}
 
 {% block content %}
 <div class="container mt-5">
@@ -16,7 +16,7 @@
     <h3>Your Upcoming Shifts</h3>
     {% if shifts %}
         <table class="table table-bordered">
-            <thead>
+            <thead class="custom-dark-blue text-white">
                 <tr>
                     <th>Date</th>
                     <th>Shift Type</th>
@@ -35,6 +35,9 @@
                 {% endfor %}
             </tbody>
         </table>
+        <div class="mb-4">
+            <a href="{% url 'request_day_off' %}" class="btn btn-primary">Request Day Off</a>
+        </div>
     {% else %}
         <p>No shifts available.</p>
     {% endif %}
