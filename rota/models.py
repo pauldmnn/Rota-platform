@@ -51,7 +51,7 @@ class Request(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='requests')
-    date = models.DateField()  # Ensure this field is present
+    date = models.DateField() 
     comment = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
     admin_comment = models.TextField(blank=True, null=True)

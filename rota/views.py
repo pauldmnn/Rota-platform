@@ -7,7 +7,7 @@ from django.contrib.sessions.backends.db import SessionStore
 from django.utils import timezone
 from .models import Rota, Request, User 
 from django.utils.timezone import now, timedelta
-from .forms import RotaForm, RequestForm, StaffCreationForm, StaffProfileForm
+from .forms import RotaForm, RequestForm, StaffCreationForm, StaffProfileForm, SignupForm
 from .models import StaffProfile
 from django.http import JsonResponse
 from django import forms
@@ -167,7 +167,7 @@ def weekly_rotas(request):
     today = now().date()
     start_of_current_week = today - timedelta(days=today.weekday())
 
-    # Define the weeks to display (current + next two weeks)
+    # Defines the weeks to display (current + next two weeks)
     weeks = []
     for i in range(3):  # Current week + next two weeks
         start_of_week = start_of_current_week + timedelta(weeks=i)
@@ -292,17 +292,6 @@ def user_login(request):
     return render(request, 'rota/login.html')
 
 
-@login_required
-def staff_profile(request):
-    """
-    Displays the staff profile with request replies and other details.
-    """
-    user_requests = Request.objects.filter(user=request.user).order_by('-created_at')
-
-    return render(request, 'rota/staff_profile.html', {
-        'user_requests': user_requests
-    })
-
 def custom_logout(request):
     """
     Logs out the user and redirects to the login page.
@@ -388,28 +377,18 @@ def list_user_profiles(request):
     return render(request, 'rota/list_user_profiles.html', {'users': users})
 
 
-@user_passes_test(lambda u: u.is_staff)
 def edit_user_profile(request, user_id):
-    """
-    View for the admin to edit a user's profile and optionally change their password.
-    """
     user = get_object_or_404(User, id=user_id)
     profile = user.profile  # Access the related StaffProfile
 
-    if request.method == "POST":
+    if request.method == 'POST':
+        # Update both User and StaffProfile forms
         user_form = StaffCreationForm(request.POST, instance=user)
         profile_form = StaffProfileForm(request.POST, instance=profile)
-        new_password = request.POST.get("password", "")
 
         if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
-
-            # Update password if provided
-            if new_password:
-                user.set_password(new_password)
-                user.save()
-
+            user_form.save()  # Save the User model
+            profile_form.save()  # Save the StaffProfile model
             messages.success(request, f"Profile for {user.username} updated successfully!")
             return redirect('list_user_profiles')
     else:
@@ -444,30 +423,6 @@ def password_reset_request(request):
     message = "Please see your line manager to reset your password."
     return render(request, "rota/password_reset_request.html", {"message": message})
 
-
-class SignupForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput)
-    confirm_password = forms.CharField(widget=forms.PasswordInput)
-
-    class Meta:
-        model = User
-        fields = ['username', 'email', 'password', 'first_name', 'last_name']
-        widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
-            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-        }
-
-    def clean(self):
-        cleaned_data = super().clean()
-        password = cleaned_data.get('password')
-        confirm_password = cleaned_data.get('confirm_password')
-
-        if password != confirm_password:
-            self.add_error('confirm_password', "Passwords do not match.")
-
-        return cleaned_data
 
 def signup(request):
     if request.method == "POST":

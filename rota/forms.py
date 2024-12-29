@@ -70,9 +70,10 @@ class StaffCreationForm(forms.ModelForm):
         fields = ['username', 'email', 'first_name', 'last_name', 'is_staff']  
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            
         }
 
 
@@ -82,10 +83,33 @@ class StaffProfileForm(forms.ModelForm):
     """
     class Meta:
         model = StaffProfile
-        fields = ['address', 'phone_number', 'job_title'] 
+        fields = ['full_name', 'address', 'phone_number', 'job_title'] 
         widgets = {
+            'full_name': forms.TextInput(attrs={'class': 'form-control'}),
             'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'email': forms.TextInput(attrs={'class': 'form-control'}),
             'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
             'job_title': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+
+class SignupForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput)
+    confirm_password = forms.CharField(widget=forms.PasswordInput)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password',]
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get('password')
+        confirm_password = cleaned_data.get('confirm_password')
+
+        if password != confirm_password:
+            self.add_error('confirm_password', "Passwords do not match.")
+
+        return cleaned_data
