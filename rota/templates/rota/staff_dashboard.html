@@ -1,32 +1,42 @@
 {% extends 'rota/base.html' %}
-{% block title %}My Dashboard{% endblock %}
+{{% load static %}}
 
 {% block content %}
-{% if staff_message %}
-<div class="alert alert-success" role="alert">
-    {{ staff_message }}
-</div>
-{% endif %}
-<div class="container">
-    <h2>My Shifts</h2>
-    {% if shifts %}
-        <ul class="list-group">
-            {% for shift in shifts %}
-                <li class="list-group-item">
-                    {{ shift.date|date:"l, d M Y" }} - {{ shift.shift_type }}
-                    {% if shift.start_time and shift.end_time %}
-                        ({{ shift.start_time }} - {{ shift.end_time }})
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No upcoming shifts assigned.</p>
-    {% endif %}
-    <div class="mt-4">
-        <a href="{% url 'request_day_off' %}" class="btn btn-primary mt-3">Request Day Off</a>
-        <a href="{% url 'completed_shifts' %}" class="btn btn-primary mt-3">View Completed Shifts</a>
+<div class="container mt-5">
+    <h2>Welcome to Your Dashboard</h2>
 
-    </div>
+    <!-- Display Request Messages -->
+    {% if request_message %}
+        <div class="alert alert-info" role="alert">
+            {{ request_message }}
+        </div>
+    {% endif %}
+
+    <!-- Shifts -->
+    <h3>Your Upcoming Shifts</h3>
+    {% if shifts %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Shift Type</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for shift in shifts %}
+                    <tr>
+                        <td>{{ shift.date }}</td>
+                        <td>{{ shift.shift_type }}</td>
+                        <td>{{ shift.start_time|default:"-" }}</td>
+                        <td>{{ shift.end_time|default:"-" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No shifts available.</p>
+    {% endif %}
 </div>
 {% endblock %}

@@ -142,16 +142,20 @@ def admin_manage_requests(request):
         if action == "approve":
             staff_request.status = "Approved"
             staff_request.admin_comment = "Your request has been approved."
-            # Store approval message in the user's session
-            user_session = SessionStore()
-            user_session['staff_message'] = "Your day-off request has been approved!"
-            user_session.save()
+            message = f"Your day-off request for {staff_request.date} has been approved."
         elif action == "reject":
             staff_request.status = "Rejected"
             staff_request.admin_comment = request.POST.get("admin_comment", "Your request has been rejected.")
+            message = f"Your day-off request for {staff_request.date} has been rejected."
+
         staff_request.save()
 
-        messages.success(request, "Request processed successfully.")
+        # Save message to the user's session
+        user_session = SessionStore(session_key=staff_request.user.session.session_key)
+        user_session['request_message'] = message
+        user_session.save()
+
+        messages.success(request, f"Request processed for {staff_request.user.username}.")
     return redirect('admin_dashboard')
 
 @user_passes_test(lambda u: u.is_staff)
@@ -243,20 +247,17 @@ def update_rota(request, rota_id):
 @login_required
 def staff_dashboard(request):
     """
-    Displays current and future shifts for the staff.
+    Displays current and future shifts for the staff and any request-related messages.
     """
     today = timezone.now().date()
     shifts = Rota.objects.filter(user=request.user, date__gte=today).order_by('date')
 
     # Retrieve the session message, if any
-    staff_message = request.session.pop('staff_message', None)
-
-    if not shifts.exists():
-        messages.info(request, "No shifts have been assigned yet.")
+    request_message = request.session.pop('request_message', None)
 
     return render(request, 'rota/staff_dashboard.html', {
         'shifts': shifts,
-        'staff_message': staff_message,
+        'request_message': request_message,
     })
 
 
