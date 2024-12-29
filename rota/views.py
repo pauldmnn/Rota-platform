@@ -10,6 +10,7 @@ from django.utils.timezone import now, timedelta
 from .forms import RotaForm, RequestForm, StaffCreationForm, StaffProfileForm
 from .models import StaffProfile
 from django.http import JsonResponse
+from django import forms
 
 
 def home(request):
@@ -422,7 +423,6 @@ def edit_user_profile(request, user_id):
     })
 
 
-
 @user_passes_test(lambda u: u.is_staff)
 def delete_user_profile(request, user_id):
     """
@@ -444,3 +444,40 @@ def password_reset_request(request):
     message = "Please see your line manager to reset your password."
     return render(request, "rota/password_reset_request.html", {"message": message})
 
+
+class SignupForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput)
+    confirm_password = forms.CharField(widget=forms.PasswordInput)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password', 'first_name', 'last_name']
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get('password')
+        confirm_password = cleaned_data.get('confirm_password')
+
+        if password != confirm_password:
+            self.add_error('confirm_password', "Passwords do not match.")
+
+        return cleaned_data
+
+def signup(request):
+    if request.method == "POST":
+        form = SignupForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+            messages.success(request, "Account created successfully. Please log in.")
+            return redirect('login')
+    else:
+        form = SignupForm()
+    return render(request, 'rota/signup.html', {'form': form})

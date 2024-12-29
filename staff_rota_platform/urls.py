@@ -16,14 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from rota import views  # Import views from the rota app
+from rota import views 
 
 urlpatterns = [
-
-    # Custom admin login and dashboard
-    path('admin/login/', views.admin_login, name='admin_login'),  # Custom admin login page
-    path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),  # Admin dashboard
-    path('login/', views.user_login, name='login'),  # Add this line
+    path('admin/login/', views.admin_login, name='admin_login'),  
+    path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('signup/', views.signup, name='signup'), 
+    path('login/', views.user_login, name='login'),  
     path('logout/', views.custom_logout, name='logout'),
     path('', views.home, name='home'),
     path('', include('rota.urls')),
