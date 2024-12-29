@@ -58,14 +58,20 @@ class StaffCreationForm(forms.ModelForm):
     """
     Form for the admin to create staff user accounts.
     """
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    password = forms.CharField(
+        widget=forms.PasswordInput,
+        required=False,  
+        help_text="Leave blank to keep the current password."
+    )
     is_staff = forms.BooleanField(required=False, label="Grant Admin Access")
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password', 'is_staff']  
+        fields = ['username', 'email', 'first_name', 'last_name', 'is_staff']  
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
         }
 
@@ -76,9 +82,8 @@ class StaffProfileForm(forms.ModelForm):
     """
     class Meta:
         model = StaffProfile
-        fields = ['full_name', 'address', 'email', 'phone_number', 'job_title'] 
+        fields = ['address', 'phone_number', 'job_title'] 
         widgets = {
-            'full_name': forms.TextInput(attrs={'class': 'form-control'}),
             'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'email': forms.TextInput(attrs={'class': 'form-control'}),
             'phone_number': forms.TextInput(attrs={'class': 'form-control'}),

@@ -390,7 +390,7 @@ def list_user_profiles(request):
 @user_passes_test(lambda u: u.is_staff)
 def edit_user_profile(request, user_id):
     """
-    View for the admin to edit a user's profile.
+    View for the admin to edit a user's profile and optionally change their password.
     """
     user = get_object_or_404(User, id=user_id)
     profile = user.profile  # Access the related StaffProfile
@@ -398,10 +398,17 @@ def edit_user_profile(request, user_id):
     if request.method == "POST":
         user_form = StaffCreationForm(request.POST, instance=user)
         profile_form = StaffProfileForm(request.POST, instance=profile)
+        new_password = request.POST.get("password", "")
 
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
+
+            # Update password if provided
+            if new_password:
+                user.set_password(new_password)
+                user.save()
+
             messages.success(request, f"Profile for {user.username} updated successfully!")
             return redirect('list_user_profiles')
     else:
@@ -413,6 +420,7 @@ def edit_user_profile(request, user_id):
         'profile_form': profile_form,
         'username': user.username,
     })
+
 
 
 @user_passes_test(lambda u: u.is_staff)
