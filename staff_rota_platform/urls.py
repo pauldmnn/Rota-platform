@@ -25,7 +25,7 @@ urlpatterns = [
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),  # Admin dashboard
     path('login/', views.user_login, name='login'),  # Add this line
     path('logout/', views.custom_logout, name='logout'),
-    path('', views.staff_dashboard, name='staff_dashboard'),
+    path('', views.home, name='home'),
     path('', include('rota.urls')),
 ]
 

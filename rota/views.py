@@ -10,7 +10,7 @@ from .models import StaffProfile
 from django.http import JsonResponse
 
 
-def home_page(request):
+def home(request):
     """
     Render the home page with a description of the site.
     """
