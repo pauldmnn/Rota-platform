@@ -13,6 +13,7 @@ SHIFT_CHOICES = [
     ("Late", "Late"),
     ("Night", "Night"),
     ("Custom", "Custom"),
+    ("Requested Off", "Requested Off"),
     ("Sickness/Absence", "Sickness/Absence"),
 ]
 
@@ -31,8 +32,8 @@ class Rota(models.Model):
     end_time = models.TimeField(blank=True, null=True) 
     is_updated = models.BooleanField(default=False)
 
-    class Meta:
-        unique_together = ('user', 'date')
+#    class Meta:
+#        unique_together = ('user', 'date')
 
 
     def __str__(self):

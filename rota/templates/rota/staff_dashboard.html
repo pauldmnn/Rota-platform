@@ -2,6 +2,11 @@
 {% block title %}My Dashboard{% endblock %}
 
 {% block content %}
+{% if staff_message %}
+<div class="alert alert-success" role="alert">
+    {{ staff_message }}
+</div>
+{% endif %}
 <div class="container">
     <h2>My Shifts</h2>
     {% if shifts %}

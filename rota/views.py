@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
+from django.contrib.sessions.models import Session
+from django.contrib.sessions.backends.db import SessionStore
 from django.utils import timezone
 from .models import Rota, Request, User 
 from django.utils.timezone import now, timedelta
@@ -85,12 +87,19 @@ def view_staff_profile(request):
 @user_passes_test(lambda u: u.is_staff)
 def admin_create_rota(request):
     """
-    Allows admin to create a rota and send email notifications via EmailJS.
+    Allows admin to create a rota 
     """
     if request.method == "POST":
         form = RotaForm(request.POST)
         if form.is_valid():
-            rota = form.save()
+            try:
+                form.save()
+                messages.success(request, "Rota created successfully.")
+            except forms.ValidationError as e:
+                messages.info(request, e.message)  # Display update message
+            return redirect('admin_create_rota')
+        else:
+            messages.error(request, "Error creating rota. Please fix the issues below.")
     else:
         form = RotaForm()
 
@@ -133,56 +142,52 @@ def admin_manage_requests(request):
         if action == "approve":
             staff_request.status = "Approved"
             staff_request.admin_comment = "Your request has been approved."
+            # Store approval message in the user's session
+            user_session = SessionStore()
+            user_session['staff_message'] = "Your day-off request has been approved!"
+            user_session.save()
         elif action == "reject":
             staff_request.status = "Rejected"
             staff_request.admin_comment = request.POST.get("admin_comment", "Your request has been rejected.")
-
         staff_request.save()
 
-        # Add a feedback message for the user
-        messages.add_message(request, messages.SUCCESS, f"Request reply has been sent to {staff_request.user.username}.")
-
+        messages.success(request, "Request processed successfully.")
     return redirect('admin_dashboard')
 
 @user_passes_test(lambda u: u.is_staff)
 def weekly_rotas(request):
+    """
+    Admin view to display the weekly rota with allocated shifts only.
+    """
     today = now().date()
+    start_of_current_week = today - timedelta(days=today.weekday())
 
-    # Define week start and end for current and next two weeks
+    # Define the weeks to display (current + next two weeks)
     weeks = []
-    for week_offset in range(3):
-        start_of_week = today - timedelta(days=today.weekday()) + timedelta(weeks=week_offset)
+    for i in range(3):  # Current week + next two weeks
+        start_of_week = start_of_current_week + timedelta(weeks=i)
         end_of_week = start_of_week + timedelta(days=6)
-        weeks.append((start_of_week, end_of_week))
-
-    # Fetch all staff (non-superuser users for staff, adjust if needed)
-    all_staff = User.objects.filter(is_active=True).order_by('first_name')
-
-    # Fetch rotas for the three weeks
-    rotas_by_week = []
-    for start_of_week, end_of_week in weeks:
-        week_dates = [start_of_week + timedelta(days=i) for i in range(7)]
-        weekly_rotas = Rota.objects.filter(date__range=[start_of_week, end_of_week]).order_by('date')
-
-        rota_by_staff = []
-        for staff in all_staff:
-            staff_data = {'user': staff, 'shifts': {}}
-            for date in week_dates:
-                staff_data['shifts'][date] = None  # Initialize with no shifts
-            for rota in weekly_rotas.filter(user=staff):
-                staff_data['shifts'][rota.date] = rota
-            rota_by_staff.append(staff_data)
-
-        rotas_by_week.append({
-            'week_dates': week_dates,  # Ensure exactly 7 days
-            'rota_by_staff': rota_by_staff,
+        weeks.append({
             'start_of_week': start_of_week,
             'end_of_week': end_of_week,
+            'week_dates': [start_of_week + timedelta(days=j) for j in range(7)],
         })
 
+    # Query all staff and rota data
+    all_users = User.objects.all() 
+    weekly_rotas = Rota.objects.filter(date__range=[weeks[0]['start_of_week'], weeks[-1]['end_of_week']])
+
+    # Organize rota data by user and week
+    rota_data = []
+    for user in all_users:
+        user_shifts = {}
+        for rota in weekly_rotas.filter(user=user):
+            user_shifts[rota.date] = rota  # Assign Rota object for the date
+        rota_data.append({'user': user, 'shifts': user_shifts})
+
     return render(request, 'rota/weekly_rotas.html', {
-        'rotas_by_week': rotas_by_week,
-        'highlight_shift_types': ["Sickness/Absence"],  # Pass this list to the template
+        'rota_data': rota_data,
+        'weeks': weeks,
     })
 
 
@@ -232,7 +237,7 @@ def update_rota(request, rota_id):
         messages.success(request, "Rota updated successfully.")
         return redirect('admin_weekly_rota')
 
-    return render(request, 'rota/update_rota.html', {'rota': rota_entry})
+    return render(request, 'rota/update_rotas.html', {'rota': rota_entry})
 
 
 @login_required
@@ -243,10 +248,16 @@ def staff_dashboard(request):
     today = timezone.now().date()
     shifts = Rota.objects.filter(user=request.user, date__gte=today).order_by('date')
 
+    # Retrieve the session message, if any
+    staff_message = request.session.pop('staff_message', None)
+
     if not shifts.exists():
         messages.info(request, "No shifts have been assigned yet.")
 
-    return render(request, 'rota/staff_dashboard.html', {'shifts': shifts})
+    return render(request, 'rota/staff_dashboard.html', {
+        'shifts': shifts,
+        'staff_message': staff_message,
+    })
 
 
 def user_login(request):
@@ -310,22 +321,21 @@ def completed_shifts(request):
 @login_required
 def request_day_off(request):
     """
-    Allows staff to request a day off.
-    Admins are restricted from accessing this view.
+    Allows staff to request a day off. Displays messages directly on the request page.
     """
     if request.user.is_staff:
         return redirect('admin_dashboard')  # Redirect admins to their dashboard
 
+    form = RequestForm(request.POST or None)
     if request.method == "POST":
-        form = RequestForm(request.POST)
         if form.is_valid():
             request_obj = form.save(commit=False)
             request_obj.user = request.user
             request_obj.save()
-            messages.success(request, "Your request has been submitted successfully.")
-            return redirect('staff_dashboard')
-    else:
-        form = RequestForm()
+            messages.success(request, "Your day-off request has been submitted successfully.")
+            form = RequestForm()  # Clear the form after a successful submission
+        else:
+            messages.error(request, "There was an error submitting your request. Please try again.")
 
     return render(request, 'rota/request_day_off.html', {'form': form})
 

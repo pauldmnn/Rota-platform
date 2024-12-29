@@ -89,6 +89,14 @@ h1 {
     padding: 15px;
 }
 
+
+.sickness-absence {
+    background-color: red;
+    color: white;
+    text-align: center;
+}
+
+
 /* Show element */
 .show {
     display: block;

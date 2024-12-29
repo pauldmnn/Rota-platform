@@ -2,64 +2,44 @@
 {% load rota_filters %}
 {% load static %}
 
-{% block title %}Weekly Rotas{% endblock %}
-
 {% block content %}
 <div class="container mt-5">
-    <h2 class="text-center">Weekly Rotas</h2>
+    <h2>Weekly Rota</h2>
 
-    {% for week_data in rotas_by_week %}
-        <h3 class="mt-4">Week Commencing: {{ week_data.start_of_week|date:"l, M d" }} - {{ week_data.end_of_week|date:"l, M d" }}</h3>
-        <table class="table table-bordered table-striped">
-            <thead class="custom-dark-blue text-white">
-                <tr>
-                    <th>Staff Name</th>
-                    {% for day in week_data.week_dates %}
-                        <th>{{ day|date:"l, M d" }}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for staff_data in week_data.rota_by_staff %}
-                    <tr>
-                        <td>{{ staff_data.user.get_full_name|default:staff_data.user.username }}</td>
-                        {% for day in week_data.week_dates %}
-                            <td style="position: relative;" data-user-id="{{ staff_data.user.id }}" data-date="{{ day|date:'Y-m-d' }}">
-                                {% with shift=staff_data.shifts|get_item:day %}
-                                    <select class="shift-select form-control">
-                                        <option value=""></option>
-                                        <option value="Long Day" {% if shift and shift.shift_type == "Long Day" %}selected{% endif %}>Long Day</option>
-                                        <option value="Early" {% if shift and shift.shift_type == "Early" %}selected{% endif %}>Early</option>
-                                        <option value="Late" {% if shift and shift.shift_type == "Late" %}selected{% endif %}>Late</option>
-                                        <option value="Night" {% if shift and shift.shift_type == "Night" %}selected{% endif %}>Night</option>
-                                        <option value="Custom" {% if shift and shift.shift_type == "Custom" %}selected{% endif %}>Custom</option>
-                                        <option value="Sickness/Absence" {% if shift and shift.shift_type == "Sickness/Absence" %}selected{% endif %}>Sickness/Absence</option>
-                                    </select>
-                                    <div class="custom-time-input {% if shift and shift.shift_type == 'Custom' %}show{% endif %}">
-                                        <input type="time" class="start-time form-control mb-1" value="{{ shift.start_time|default:'' }}">
-                                        <input type="time" class="end-time form-control" value="{{ shift.end_time|default:'' }}">
-                                    </div>
-                                    <input type="text"
-                                    class="sickness-type form-control mt-1 {% if shift and shift.shift_type == 'Sickness/Absence' %}show sickness-absence{% else %}hide{% endif %}"
-                                    placeholder="Type of Sickness/Absence"
-                                    value="{% if shift and shift.shift_type == 'Sickness/Absence' %}{{ shift.sickness_or_absence_type }}{% endif %}">
-                                    {% if shift and shift.shift_type %}
-                                    <small>
-                                        {{ shift.start_time|default:"" }}{% if shift.start_time and shift.end_time %} - {% endif %}{{ shift.end_time|default:"" }}
-                                    </small>
-                                    {% endif %}
-                                {% endwith %}
-                            </td>
-                        {% endfor %}
-                    </tr>
+    {% for week in weeks %}
+    <h3 class="mt-4">
+        Week Commencing: {{ week.start_of_week|date:"D, M d" }} - {{ week.end_of_week|date:"D, M d" }}
+    </h3>
+    <table class="table table-bordered">
+        <thead class="custom-dark-blue text-white">
+            <tr>
+                <th>Staff Name/Username</th>
+                {% for date in week.week_dates %}
+                <th>{{ date|date:"D, M d" }}</th>
                 {% endfor %}
-            </tbody>
-        </table>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in rota_data %}
+            <tr>
+                <td>{{ data.user.get_full_name|default:data.user.username }}</td>
+                {% for date in week.week_dates %}
+                <td class="{% if data.shifts|get_item:date and data.shifts|get_item:date.shift_type == 'Sickness/Absence' %}sickness-absence{% endif %}">
+                    {% with data.shifts|get_item:date as shift %}
+                        {% if shift %}
+                            {{ shift.shift_type }}
+                            <br>
+                            <small>{{ shift.start_time|default:"-" }} - {{ shift.end_time|default:"-" }}</small>
+                        {% else %}
+                            
+                        {% endif %}
+                    {% endwith %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
     {% endfor %}
 </div>
-
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/script.js' %}"></script>
 {% endblock %}
