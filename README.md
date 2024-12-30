@@ -6,61 +6,76 @@ The application is designed for user to see their allocated working schedule whi
 
 The application was build using Django which offers and intuitive interface for both administrators and staff members
 
-
-
 [Here is a link to my live version of my project](https://rota-platform-0319936c5b72.herokuapp.com/)
 
-![Responsive view of Budget tracker](testing/devices.png)
+- Phone 
+![Responsive view of Budget tracker](static/test-images/phone.png)
+- Desktop
+![Responsive view of Budget tracker](static/test-images/desktop.png)
+- Tablet
+![Responsive view of Budget tracker](static/test-images/tablet.png)
 
 ## How the app works
-The user will input their original budget and then they will be asked to select one of four choices (1/2/3/4/5)
+- Admin credentials were created using the create superuser command in the terminal. A superuser cannot be deleted. His details can be changed to reflect the new account. 
+- I have created Assesor Admin and a Assessor User account for the project submission. The credentials will be addedd to the submission page 
+- The superuser can give credentials to other user to login to the admin page. 
+- When a user open the webpage the will see the home page. 
+- In the home page there are two buttons. One for Sign Up and another one for Login. 
+- If a user already has an account they will login into the site. If they don't have an account they can create their own account.
 
-The first choice is for the user to add spending description once that is entered the the app will ask the user to enter the amount spent. 
-
-The second choice is for the user to check the budget balance and what were the spendings and amount spent. 
-
-Choice three is for the user to add more amount to the original budget
-
-Choice four resets the budget and spendings to zero so the user can add a new budget and spendings
-
-Choice five is for the user to exit the app. When the user exits the app a goodbye message will be printed on the console
 
 ## Features
-- User inputs their budget.
-![Input budget](testing/add-amount-to-spend.png)
 
-- User can choose one of the five choices.
-![The five choices](testing/choose-option.png)
+- **User Registration & Authentication**  
+  - Secure sign-up and sign-in functionality.  
+  - Admin and standard staff roles with appropriate permissions.
 
-- User adds a description of what they spent their money.
-- User adds the amount of money they spent.
-![Choice one](testing/choice-one.png)
+- **Shift Scheduling**  
+  - Admin can add, edit, and delete staff shifts.  
+  - Staff can view their weekly rota and can view already worked shifts
 
-- User can check their balance and see on what they spent their money.
-- The user will constant see their spendings until the tracker is reset.
-![Choice two](testing/choice-two.png)
+- **Absence & Sickness Management**  
+  - Staff cab use the platform to send a request for a day off and write and explanation about why or they can inform the admin about sickness absence through the request.
+  - The admin can add the request to the rota and can add sickness/absence to the rota which will display in the weekly roat and on the staff dashboard when they login  
+  - Admin can approve or reject requests, automatically updating the schedule.
 
-- User can add more money to the original budget.
-![Choice three](testing/choice-three.png)
+- **Responsive Design**  
+  - Optimized to provide a consistent experience across desktops, tablets, and mobile devices.
 
-- The user will constant see their spendings.
+## UI & UX
 
-- The user can reset their budget to zero and then add a new budget.
-![Choice four](testing/choice-four.png)
+1. **Color Palette**  
+   - *Primary Color*: `#4A90E2` (used for key actions, such as buttons and headers)  
+   - *Secondary Color*: `#D0021B` (used for alerts or warnings)
+   - *Primary nav-bar and table header color: `#004386` 
+   - *Neutral Palette*: 
+     - White `#FFFFFF` (backgrounds),  
+     - Light Gray `#F4F4F4` (sections, forms),  
+     - Dark Gray `#333333` (text and navigation links)
 
-- When the user will exit the app a goodbye message will be printed.
-![Choice five](testing/choice-five.png)
+2. **Design Approach**  
+   - **User-Centered**: Quick navigation links for the most common tasks (view shifts, request a day off).  
+   - **Clarity & Consistency**: Reusable components (buttons, forms) have consistent styling for intuitive interaction.  
+   - **Accessibility**: Proper contrast, larger click areas, and descriptive alt text for images/icons.
 
-## Data model
+3. **User Flow**  
+   - **Admin**:
+     1. Log in to the admin dashboard.  
+     2. Create or modify staff rotas.  
+     3. Approve or reject time-off requests.  
+   - **Staff**:
+     1. Log in to view personal rota.  
+     2. Request time off or mark sickness.  
+     3. Check passed work shifts
 
-- I decided to use the Main function which checks all the other function to ensure that the Budget tracker app runs correctly. 
 
-- The main function also has print methods which prints instructions for the user. 
+## Tech Stack
 
-- I have created a JSON file which updates and saves the data which the user inputs it in the terminal. The data is saved until the user chooses Choice 4 which resets the tracker and then exits the tracker. 
-
-- I have created a flowchart to display the thinking behind the app. 
-![Flowchart](testing/flowchart.png)
+- **Python 3 & Django**: For the back-end logic and data handling.  
+- **HTML, CSS, JavaScript**: For front-end templates and styling.  
+- **PostgreSQL** For database storage.  
+- **Gunicorn**: As the WSGI server for Heroku deployment.  
+- **Heroku**: Hosting platform for production.
 
 ## Testing
 
@@ -69,30 +84,29 @@ Choice five is for the user to exit the app. When the user exits the app a goodb
 - I have passed the code through PEP8 linter and confirmed there are no problems
 - Tested in my local terminal and in the Code Institute Heroku terminal
 
+- Because of time constraints onLy the Models were automaticly tested.
+
+
 ### Bugs
 
 #### Bugs found
 
-- I found that in the "Add you budget" if a letter or a symbol was typed on the console an error was typed
-- In the Choice 1 the user was able to input a number or a symbol for the "Description of spendings".
-- When an amount was asked to be inputted the user was able to input letters or symbols as well as numbers
-
-#### Bugs solved
-
-- I created an input validation for the original_budget variable so it only takes numbers. If anything, else than numbers are introduced the console will print a message.
-![Takes only numbers](testing/takes-only-numbers.png)
-
-- I created an input validation for the description so it only takes letters and spaces but cannot take empty spaces. If anything, else than letters are introduced the console will print a message.
-![Testing errors fixed](testing/testing-errors-fixed.png)
+- I found that the message when a profile was updated is displayed on the login page instead of the staff dashboard.
 
 #### Remaining bugs
 
-- There are no remaining bugs.
+- The message continues to be displayed on the login page. The message will dissapear if the page is reloaded.
 
 ### Validator testing
 
 - PEP8
     - No errors were returned on [PEP8online.com](https://pep8ci.herokuapp.com/)
+- HTML
+    - No errors were returned on [validator.w3.org/](https://validator.w3.org/)
+    ![HTML Validator](static/test-images/html-validation.png)
+- CSS
+    - No errors were returned on [jigsaw.w3.org](https://jigsaw.w3.org/)
+    ![CSS Validator](static/test-images/css-validator.png)
 
 ## Deployment
 

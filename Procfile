@@ -1,1 +1,1 @@
-web: gunicorn staff_rota_platform.wsgi --log-file -
+web: gunicorn staff_rota_platform.wsgi

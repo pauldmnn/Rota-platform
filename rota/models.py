@@ -59,7 +59,7 @@ class Request(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return f"{self.user.user} - {self.date} ({self.status})"
+        return f"{self.user.username} - {self.date} ({self.status})"
 
 
 class StaffProfile(models.Model):
