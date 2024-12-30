@@ -15,8 +15,9 @@ class RotaForm(forms.ModelForm):
             'end_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
             'shift_type': forms.Select(attrs={'class': 'form-control'}),
         }
+
         def save(self, commit=True):
-        # Check for an existing rota entry
+        # Checks for an existing rota entry
             user = self.cleaned_data.get('user')
             date = self.cleaned_data.get('date')
             shift_type = self.cleaned_data.get('shift_type')
@@ -26,7 +27,7 @@ class RotaForm(forms.ModelForm):
             existing_rota = Rota.objects.filter(user=user, date=date).first()
 
             if existing_rota:
-                # Update the existing rota if "Sickness/Absence" is selected
+                # Updates the existing rota if "Sickness/Absence" is selected
                 if shift_type == "Sickness/Absence":
                     existing_rota.shift_type = shift_type
                     existing_rota.start_time = None
@@ -38,8 +39,9 @@ class RotaForm(forms.ModelForm):
                 else:
                     raise forms.ValidationError("A shift has already been allocated for this date.")
             else:
-                # Create a new rota entry if no existing entry
+                # Creates a new rota entry if no existing entry
                 return super().save(commit=commit)
+
 
 class RequestForm(forms.ModelForm):
     """
@@ -61,9 +63,10 @@ class StaffCreationForm(forms.ModelForm):
     password = forms.CharField(
         widget=forms.PasswordInput,
         required=False,  
-        help_text="Leave blank to keep the current password."
+        help_text="Leave blank to keep the current password. Add a password if creating a new profile "
     )
     is_staff = forms.BooleanField(required=False, label="Grant Admin Access")
+
 
     class Meta:
         model = User
@@ -96,6 +99,7 @@ class SignupForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
     confirm_password = forms.CharField(widget=forms.PasswordInput)
 
+
     class Meta:
         model = User
         fields = ['username', 'email', 'password',]
@@ -103,6 +107,7 @@ class SignupForm(forms.ModelForm):
             'username': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
         }
+
 
     def clean(self):
         cleaned_data = super().clean()

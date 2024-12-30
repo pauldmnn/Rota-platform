@@ -19,6 +19,7 @@ def home(request):
     """
     return render(request, 'rota/home.html')
 
+
 def admin_login(request):
     """
     Custom login view for the site admin page.
@@ -28,14 +29,14 @@ def admin_login(request):
         password = request.POST.get("password")
         user = authenticate(request, username=username, password=password)
 
-        if user is not None and user.is_staff:  # Ensure the user is a staff/admin
+        if user is not None and user.is_staff:  
             login(request, user)
 
-            # Redirect superusers to the rota creation page
+            # Redirects superusers to the rota creation page
             if user.is_superuser:
                 return redirect('admin_create_rota')
             else:
-                return redirect('admin_dashboard')  # Redirect other staff to the admin dashboard
+                return redirect('admin_dashboard')  # Redirects other staff to the admin dashboard
         else:
             messages.error(request, "Invalid credentials or you do not have admin access.")
     return render(request, 'rota/admin_login.html')
@@ -51,18 +52,18 @@ def create_staff_profile(request):
         profile_form = StaffProfileForm(request.POST)
 
         if user_form.is_valid() and profile_form.is_valid():
-            # Save user
+            # Saves user
             user = user_form.save(commit=False)
             user.set_password(user_form.cleaned_data['password'])
             user.save()
 
-            # Save profile
+            # Saves profile
             profile = profile_form.save(commit=False)
             profile.user = user
             profile.save()
 
             messages.success(request, f"Profile for {user.username} created successfully!")
-            return redirect('admin_dashboard')  # Adjust to your admin page
+            return redirect('admin_dashboard')  
     else:
         user_form = StaffCreationForm()
         profile_form = StaffProfileForm()
@@ -117,6 +118,7 @@ def admin_allocated_shifts(request):
 
     return render(request, 'rota/admin_allocated_shifts.html', {'shifts': shifts})
 
+
 @user_passes_test(lambda u: u.is_staff)
 def admin_dashboard(request):
     """
@@ -156,6 +158,7 @@ def admin_manage_requests(request):
         messages.success(request, f"Request processed for {staff_request.user.username}.")
 
     return redirect('admin_dashboard')
+
 
 @user_passes_test(lambda u: u.is_staff)
 def weekly_rotas(request):
@@ -201,11 +204,11 @@ def staff_dashboard(request):
     today = timezone.now().date()
     shifts = Rota.objects.filter(user=request.user, date__gte=today).order_by('date')
 
-    # Retrieve the session message for the current user
+    # Retrieves the session message for the current user
     staff_session = request.session.get(f'session_{request.user.id}', {})
     request_message = staff_session.pop('request_message', None)
 
-    # Save the updated session (without the message)
+    # Saves the updated session 
     request.session[f'session_{request.user.id}'] = staff_session
 
     return render(request, 'rota/staff_dashboard.html', {
@@ -225,12 +228,12 @@ def user_login(request):
 
         if user is not None:
             login(request, user)
-            if user.is_staff:  # Redirect admin to admin dashboard
+            if user.is_staff:  # Redirects admin to admin dashboard
                 return redirect('admin_dashboard')
-            else:  # Redirect regular users to staff dashboard
+            else:  # Redirects regular users to staff dashboard
                 return redirect('staff_dashboard')
         else:
-            # Check if the username exists to distinguish between wrong username and wrong password
+            # Checks if the username exists to distinguish between wrong username and wrong password
             from django.contrib.auth.models import User
             if User.objects.filter(username=username).exists():
                 messages.error(request, "Wrong password. Please try again.")
@@ -246,6 +249,7 @@ def custom_logout(request):
     """
     logout(request)
     return redirect('home')
+
 
 @user_passes_test(lambda u: u.is_staff)
 def update_rota_inline(request):
@@ -296,7 +300,6 @@ def update_rota(request, rota_id):
     return render(request, 'rota/update_rotas.html', {'rota': rota_entry})
 
 
-
 @login_required
 def completed_shifts(request):
     """
@@ -304,7 +307,7 @@ def completed_shifts(request):
     Completed shifts are those with a date earlier than today.
     """
     today = now().date()
-    # Filter shifts where the date is in the past and belongs to the logged-in user
+    # Filters the shifts where the date is in the past and belongs to the logged-in user
     shifts = Rota.objects.filter(user=request.user, date__lt=today).order_by('-date')
 
     return render(request, 'rota/completed_shifts.html', {'shifts': shifts})
@@ -316,7 +319,7 @@ def request_day_off(request):
     Allows staff to request a day off. Displays messages directly on the request page.
     """
     if request.user.is_staff:
-        return redirect('admin_dashboard')  # Redirect admins to their dashboard
+        return redirect('admin_dashboard')  
 
     form = RequestForm(request.POST or None)
     if request.method == "POST":
@@ -325,7 +328,7 @@ def request_day_off(request):
             request_obj.user = request.user
             request_obj.save()
             messages.success(request, "Your day-off request has been submitted successfully.")
-            form = RequestForm()  # Clear the form after a successful submission
+            form = RequestForm()  # Clears the form after a successful submission
         else:
             messages.error(request, "There was an error submitting your request. Please try again.")
 
@@ -342,13 +345,12 @@ def create_staff_profile(request):
         profile_form = StaffProfileForm(request.POST)
 
         if user_form.is_valid() and profile_form.is_valid():
-            # Save user
             user = user_form.save(commit=False)
             user.set_password(user_form.cleaned_data['password'])
             user.is_staff = user_form.cleaned_data['is_staff']  # Set admin rights
             user.save()
 
-            # Update profile fields if a profile already exists
+            # Updates the profile fields if a profile already exists
             profile = user.profile  # Access the automatically created profile
             profile_form = StaffProfileForm(request.POST, instance=profile)
             profile_form.save()
@@ -376,16 +378,16 @@ def list_user_profiles(request):
 
 def edit_user_profile(request, user_id):
     user = get_object_or_404(User, id=user_id)
-    profile = user.profile  # Access the related StaffProfile
+    profile = user.profile  
 
     if request.method == 'POST':
-        # Update both User and StaffProfile forms
+        # Updates both User and StaffProfile forms
         user_form = StaffCreationForm(request.POST, instance=user)
         profile_form = StaffProfileForm(request.POST, instance=profile)
 
         if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()  # Save the User model
-            profile_form.save()  # Save the StaffProfile model
+            user_form.save()  
+            profile_form.save()  
             messages.success(request, f"Profile for {user.username} updated successfully!")
             return redirect('list_user_profiles')
     else:
