@@ -31,6 +31,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = False
 
 ALLOWED_HOSTS = ['8000-pauldmnn-rotaplatform-bswsshkpux0.ws.codeinstitute-ide.net',
+                'https://rota-platform-0319936c5b72.herokuapp.com/',
                 '.herokuapp.com']
 
 

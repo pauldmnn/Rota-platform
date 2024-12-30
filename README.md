@@ -8,7 +8,7 @@ The application was build using Django which offers and intuitive interface for 
 
 
 
-[Here is a link to my live version of my project](https://budget-tracker-project-f6f2ed2617c9.herokuapp.com/)
+[Here is a link to my live version of my project](https://rota-platform-0319936c5b72.herokuapp.com/)
 
 ![Responsive view of Budget tracker](testing/devices.png)
 
@@ -131,4 +131,4 @@ The project was deployed using Code Institute's mock terminal for Heroku
 
 ## Credits
 - Code Institute for the deployment terminal
-- YouTube and Google for various code assistance 
+- YouTube, ChatGPT, Google, Slack Overflow for various code assistance 
