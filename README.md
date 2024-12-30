@@ -85,6 +85,49 @@ The application was build using Django which offers and intuitive interface for 
 - Tested in my local terminal and in the Code Institute Heroku terminal
 
 - Because of time constraints onLy the Models were automaticly tested.
+- I complated manual testing on all pages and forms
+
+  - Admin dashboard
+![Admin dashboard](static/test-images/admin-dashboard.png)
+  - Create staff profile form
+![Create staff profile form](static/test-images/create-staff-profile-form.png)
+  - Change password page
+![Change password page](static/test-images/change-password-page.png)
+  - Complete shifts page
+![Complete shifts page](static/test-images/completed-shifts-page.png)
+  - Create roat form
+![Create roat form](static/test-images/create-rota-form.png)
+  - Create staff profile form
+![Create staff profile form](static/test-images/create-staff-profile-form.png)
+  - Delete profile alert
+![Delete profile alert](static/test-images/delete-profile-alert.png)
+  - Edit profile form
+![Edit profile form](static/test-images/edit-profile-form.png)
+  - Forgot password page
+![Forgot password page](static/test-images/forgot-password-page.png)
+  - Login page
+![Login page](static/test-images/login-page.png)
+  - Request page
+![Request page](static/test-images/request-page.png)
+  - Signup form
+![Signup form](static/test-images/signup-form.png)
+  - User dashboard
+![User dashboard](static/test-images/user-dashboard.png)
+  - User not found message
+![User not found message](static/test-images/user-not-found-message.png)
+  - View all user
+![View all user](static/test-images/view-all-users-profile.png)
+  - View my shifts page
+![View my shifts page](static/test-images/view-my-shifts-page.png)
+  - Weekly rota
+![Weekly rota](static/test-images/weekly-rota-table.png)
+  - Message when wrong password is entered more than 5 times
+![Message when wrong password is entered more than 5 times](static/test-images/wrong-password-entered-to-may-times-message.png)
+  - Wrong password message
+![Wrong password message](static/test-images/wrong-password-message.png)
+  - Your profile page
+![Your profile page](static/test-images/your-profile-page.png)
+
 
 
 ### Bugs
