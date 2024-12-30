@@ -22,20 +22,23 @@ class Rota(models.Model):
     """
     Model to store shift details for staff members.
     """
-    user = models.ForeignKey(User, on_delete=models.CASCADE) 
-    date = models.DateField()  
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField()
     shift_type = models.CharField(
         max_length=50, choices=SHIFT_CHOICES, default="Long Day"
-    )  
-    sickness_or_absence_type = models.CharField(max_length=255, blank=True, null=True)  # New field
-    start_time = models.TimeField(blank=True, null=True)  
-    end_time = models.TimeField(blank=True, null=True) 
+    )
+    sickness_or_absence_type = models.CharField(max_length=255,
+                                                blank=True, null=True)
+    start_time = models.TimeField(blank=True, null=True)
+    end_time = models.TimeField(blank=True, null=True)
     is_updated = models.BooleanField(default=False)
-
 
     def __str__(self):
         if self.shift_type == "Custom" and self.start_time and self.end_time:
-            return f"{self.user.get_full_name()} - {self.date} - Custom ({self.start_time} to {self.end_time})"
+            return (
+                f"{self.user.get_full_name()} - {self.date} - Custom "
+                f"({self.start_time} to {self.end_time})"
+            )
         return f"{self.user.get_full_name()} - {self.date} - {self.shift_type}"
 
 
@@ -46,25 +49,28 @@ class Request(models.Model):
         ('Rejected', 'Rejected'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='requests')
-    date = models.DateField() 
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             related_name='requests')
+    date = models.DateField()
     comment = models.TextField(blank=True, null=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES,
+                              default='Pending')
     admin_comment = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
-
 
     def __str__(self):
         return f"{self.user.user} - {self.date} ({self.status})"
 
 
 class StaffProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE,
+                                related_name='profile')
     full_name = models.CharField(max_length=255)
     address = models.TextField(blank=True, null=True)
-    email = models.EmailField(max_length=255, blank=True, null=True, unique=True)
+    email = models.EmailField(max_length=255, blank=True,
+                              null=True, unique=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
-    job_title = models.CharField(max_length=100, blank=True, null=True) 
+    job_title = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return self.user.username
@@ -86,5 +92,3 @@ def save_profile(sender, instance, **kwargs):
     """
     if hasattr(instance, 'profile'):
         instance.profile.save()
-
-

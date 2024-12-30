@@ -16,17 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from rota import views 
+from rota import views
 
 urlpatterns = [
-    path('admin/login/', views.admin_login, name='admin_login'),  
+    path('admin/login/', views.admin_login, name='admin_login'),
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
-    path('signup/', views.signup, name='signup'), 
-    path('login/', views.user_login, name='login'),  
+    path('signup/', views.signup, name='signup'),
+    path('login/', views.user_login, name='login'),
     path('logout/', views.custom_logout, name='logout'),
     path('', views.home, name='home'),
     path('', include('rota.urls')),
 ]
-
-
-
