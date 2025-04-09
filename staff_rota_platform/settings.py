@@ -30,7 +30,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['8000-pauldmnn-rotaplatform-bswsshkpux0.ws.codeinstitute-ide.net',
+ALLOWED_HOSTS = ['127.0.0.1',
                 'https://rota-platform-0319936c5b72.herokuapp.com/',
                 '.herokuapp.com']
 
