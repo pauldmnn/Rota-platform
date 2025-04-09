@@ -11,42 +11,37 @@ class RotaForm(forms.ModelForm):
         model = Rota
         fields = ['user', 'date', 'shift_type', 'start_time', 'end_time']
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date',
-                                    'class': 'form-control'}),
-            'start_time': forms.TimeInput(attrs={'type': 'time',
-                                          'class': 'form-control'}),
-            'end_time': forms.TimeInput(attrs={'type': 'time',
-                                        'class': 'form-control'}),
+            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'start_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+            'end_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
             'shift_type': forms.Select(attrs={'class': 'form-control'}),
         }
 
-        def save(self, commit=True):
-            # Checks for an existing rota entry
-            user = self.cleaned_data.get('user')
-            date = self.cleaned_data.get('date')
-            shift_type = self.cleaned_data.get('shift_type')
-            start_time = self.cleaned_data.get('start_time')
-            end_time = self.cleaned_data.get('end_time')
+    def save(self, commit=True):
+        # Checks for an existing rota entry
+        user = self.cleaned_data.get('user')
+        date_value = self.cleaned_data.get('date')
+        shift_type = self.cleaned_data.get('shift_type')
+        start_time = self.cleaned_data.get('start_time')
+        end_time = self.cleaned_data.get('end_time')
 
-            existing_rota = Rota.objects.filter(user=user, date=date).first()
+        existing_rota = Rota.objects.filter(user=user, date=date_value).first()
 
-            if existing_rota:
-                # Updates the existing rota if "Sickness/Absence" is selected
-                if shift_type == "Sickness/Absence":
-                    existing_rota.shift_type = shift_type
-                    existing_rota.start_time = None
-                    existing_rota.end_time = None
-                    existing_rota.is_updated = True
-                    if commit:
-                        existing_rota.save()
-                    return existing_rota
-                else:
-                    raise forms.ValidationError(
-                            "A shift has already been allocated for this date."
-                            )
+        if existing_rota:
+            # Updates the existing rota if "Sickness/Absence" is selected
+            if shift_type == "Sickness/Absence":
+                existing_rota.shift_type = shift_type
+                existing_rota.start_time = None
+                existing_rota.end_time = None
+                existing_rota.is_updated = True
+                if commit:
+                    existing_rota.save()
+                return existing_rota
             else:
-                # Creates a new rota entry if no existing entry
-                return super().save(commit=commit)
+                raise forms.ValidationError("A shift has already been allocated for this date.")
+        else:
+            # Creates a new rota entry if no existing entry
+            return super().save(commit=commit)
 
 
 class RequestForm(forms.ModelForm):
@@ -55,7 +50,7 @@ class RequestForm(forms.ModelForm):
     """
     class Meta:
         model = Request
-        fields = ['date', 'comment']  # Fields staff can fill out
+        fields = ['date', 'comment']  
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date',
                                     'class': 'form-control'}),
