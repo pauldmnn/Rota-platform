@@ -19,7 +19,7 @@ urlpatterns = [
          name='request_day_off'),
     path('admin/manage_requests/', views.admin_manage_requests,
          name='admin_manage_requests'),
-    path('login/', views.user_login, name='login'),
+    path('login/', views.user_login, name='user_login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'),
          name='logout'),
     path('admin/create_rota/', views.admin_create_rota,

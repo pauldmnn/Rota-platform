@@ -395,7 +395,7 @@ def create_staff_profile(request):
             user.save()
 
             # Updates the profile fields if a profile already exists
-            profile = user.profile  # Access the automatically created profile
+            profile = user.profile  
             profile_form = StaffProfileForm(request.POST, instance=profile)
             profile_form.save()
 
