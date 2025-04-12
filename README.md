@@ -8,76 +8,140 @@ The application was build using Django which offers and intuitive interface for 
 
 [Here is a link to my live version of my project](https://rota-platform-0319936c5b72.herokuapp.com/)
 
-- Phone 
-![Responsive view of Budget tracker](static/test-images/phone.png)
-- Desktop
-![Responsive view of Budget tracker](static/test-images/desktop.png)
-- Tablet
-![Responsive view of Budget tracker](static/test-images/tablet.png)
+## Responsive Views
 
-## How the app works
-- Admin credentials were created using the create superuser command in the terminal. A superuser cannot be deleted. His details can be changed to reflect the new account. 
-- I have created Assesor Admin and a Assessor User account for the project submission. The credentials will be addedd to the submission page 
-- The superuser can give credentials to other user to login to the admin page. 
-- When a user open the webpage the will see the home page. 
-- In the home page there are two buttons. One for Sign Up and another one for Login. 
-- If a user already has an account they will login into the site. If they don't have an account they can create their own account.
+- **Phone**  
+  ![Responsive view on Phone](static/test-images/phone.png)
+- **Desktop**  
+  ![Responsive view on Desktop](static/test-images/desktop.png)
+- **Tablet**  
+  ![Responsive view on Tablet](static/test-images/tablet.png)
+
+---
+
+## How the App Works
+
+- **Admin Credentials:**  
+  Created using the `createsuperuser` command in the terminal. A superuser (whose details can be modified but not deleted) is available by default.
+- **Submission Accounts:**  
+  For project submission, Assessor Admin and Assessor User accounts have been created; their credentials are provided on the submission page.
+- **User Flow:**  
+  When a user opens the webpage, they see the home page with two buttons – one for **Sign Up** and one for **Login**.  
+  - Existing users log in.
+  - New users can create their own account.
+  - The superuser can grant credentials to other users to enable them to log in to the admin page.
+
+---
 
 
 ## Features
 
 - **User Registration & Authentication**  
-  - Secure sign-up and sign-in functionality.  
+  - Secure sign‑up and sign‑in functionality.
   - Admin and standard staff roles with appropriate permissions.
 
 - **Shift Scheduling**  
-  - Admin can add, edit, and delete staff shifts.  
-  - Staff can view their weekly rota and can view already worked shifts
+  - Admins can add, edit, and delete staff shifts.
+  - Staff can view their weekly rota and see completed shifts.
 
 - **Absence & Sickness Management**  
-  - Staff cab use the platform to send a request for a day off and write and explanation about why or they can inform the admin about sickness absence through the request.
-  - The admin can add the request to the rota and can add sickness/absence to the rota which will display in the weekly roat and on the staff dashboard when they login  
-  - Admin can approve or reject requests, automatically updating the schedule.
+  - Staff can submit requests for a day off (with an explanation) or report sickness.
+  - The admin can add sickness/absence entries to the rota.
+  - Admins can approve or reject requests, automatically updating the schedule.
 
 - **Responsive Design**  
-  - Optimized to provide a consistent experience across desktops, tablets, and mobile devices.
+  - Optimized to provide a consistent user experience across desktops, tablets, and mobile devices.
+
+---
 
 ## UI & UX
 
-1. **Color Palette**  
-   - *Primary Color*: `#4A90E2` (used for key actions, such as buttons and headers)  
-   - *Secondary Color*: `#D0021B` (used for alerts or warnings)
-   - *Primary nav-bar and table header color: `#004386` 
-   - *Neutral Palette*: 
-     - White `#FFFFFF` (backgrounds),  
-     - Light Gray `#F4F4F4` (sections, forms),  
-     - Dark Gray `#333333` (text and navigation links)
+### Color Palette
 
-2. **Design Approach**  
-   - **User-Centered**: Quick navigation links for the most common tasks (view shifts, request a day off).  
-   - **Clarity & Consistency**: Reusable components (buttons, forms) have consistent styling for intuitive interaction.  
-   - **Accessibility**: Proper contrast, larger click areas, and descriptive alt text for images/icons.
+- **Primary Color:** `#4A90E2` (used for key actions such as buttons and headers)
+- **Secondary Color:** `#D0021B` (used for alerts or warnings)
+- **Navbar & Table Header:** `#004386`
+- **Neutral Palette:**  
+  - White: `#FFFFFF` (backgrounds)  
+  - Light Gray: `#F4F4F4` (sections, forms)  
+  - Dark Gray: `#333333` (text and navigation links)
 
-3. **User Flow**  
-   - **Admin**:
-     1. Log in to the admin dashboard.  
-     2. Create or modify staff rotas.  
-     3. Approve or reject time-off requests.  
-   - **Staff**:
-     1. Log in to view personal rota.  
-     2. Request time off or mark sickness.  
-     3. Check passed work shifts
+### Design Approach
+
+- **User‑Centered:**  
+  Quick navigation links for common tasks (view shifts, request a day off).
+- **Clarity & Consistency:**  
+  Reusable components (buttons, forms) have consistent styling for an intuitive interaction.
+- **Accessibility:**  
+  Proper contrast, larger clickable areas, and descriptive alt text for images/icons.
+
+### User Flow
+
+- **Admin:**  
+  1. Log in to the admin dashboard.  
+  2. Create or modify staff rotas.  
+  3. Approve or reject day‑off requests.
+
+- **Staff:**  
+  1. Log in to view their personal rota.  
+  2. Request time off or report sickness.  
+  3. Review past work shifts.
+
+---
+
 
 
 ## Tech Stack
 
-- **Python 3 & Django**: For the back-end logic and data handling.  
-- **HTML, CSS, JavaScript**: For front-end templates and styling.  
-- **PostgreSQL** For database storage.  
-- **Gunicorn**: As the WSGI server for Heroku deployment.  
-- **Heroku**: Hosting platform for production.
+- **Backend:** Python 3 & Django 4.2.17  
+- **Frontend:** HTML, CSS, JavaScript, Bootstrap 5  
+- **Database:** PostgreSQL  
+- **Server:** Gunicorn for Heroku deployment  
+- **Hosting:** Heroku  
+- **Security:** django‑axes for enhanced authentication security
+
+---
+
+## Design & Wireframes
+
+### Diagram
+![Architecture Diagram](static/test-images/diagram.png)
+
+### Wireframe
+
+#### Admin dashboard
+![Admin dashboard](static\test-images\admin_dashboard_wireframe.png)
+
+#### Home page
+![Home page](static\test-images\home_page_wireframe.png)
+
+#### Request Day Off
+![Request Day Off](static\test-images\request_day_off_wireframe.png)
+
+#### User Dashboard
+![User Dashboard](static\test-images\user_dashboard_wireframe.png)
+
+#### Create rota
+![Create rota](static\test-images\create_rota_wireframe.png)
+
+#### User Profiles
+![User Profiles](static\test-images\user_profiles_wireframe.png)
+
+#### Weekly rota
+![Weekly rota](static\test-images\weekly_rota_wireframe.png)
+
+#### Your Profile
+![Your Profile](static\test-images\your_profile_wireframe.png)
 
 ## Testing
+
+### Automated testing
+  - Admin dashboard
+![Automated testing](static/test-images/automated_testing_screenshot.png)
+
+### Manual testing
+
+
 
 #### I have manually tested the code
 
